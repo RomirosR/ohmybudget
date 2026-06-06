@@ -1,14 +1,13 @@
-"""Утилиты периодов. Месяцы берутся из таблицы `months` (order_index 1..12),
-а не из константы в коде."""
+"""Утилиты периодов. Месяц — число 1..12 (само по себе задаёт порядок)."""
 
 
-def sort_key(year: int, order_index: int) -> tuple[int, int]:
-    """Ключ хронологической сортировки (год, порядковый номер месяца)."""
-    return (year, order_index)
+def sort_key(year: int, month: int) -> tuple[int, int]:
+    """Ключ хронологической сортировки (год, номер месяца)."""
+    return (year, month)
 
 
-def next_month(year: int, order_index: int) -> tuple[int, int]:
+def next_month(year: int, month: int) -> tuple[int, int]:
     """Следующий месяц по календарю. Декабрь (12) → январь (1) следующего года."""
-    if order_index >= 12:
+    if month >= 12:
         return (year + 1, 1)
-    return (year, order_index + 1)
+    return (year, month + 1)

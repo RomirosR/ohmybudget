@@ -2,11 +2,11 @@ from app.models import MonthlyPlan
 from app.services.history_service import build_history
 
 
-def _plan(db, year, month_id, is_income, amount):
+def _plan(db, year, month, is_income, amount):
     db.add(
         MonthlyPlan(
             year=year,
-            month_id=month_id,
+            month=month,
             category="X",
             is_income=is_income,
             amount=amount,
@@ -24,7 +24,7 @@ def test_history_chronological_and_unique(db_session):
 
     rows = build_history(db_session)
 
-    keys = [(r.year, r.order_index) for r in rows]
+    keys = [(r.year, r.month) for r in rows]
     assert keys == [(2026, 1), (2026, 12), (2027, 1)]  # хронологически, без дублей
 
 

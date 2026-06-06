@@ -15,13 +15,13 @@ def get_months(db: Session = Depends(get_db)):
 
 
 @router.get("", response_model=Summary)
-def get_summary(year: int, month_id: int, db: Session = Depends(get_db)):
-    return summary_service.compute_summary(db, year, month_id)
+def get_summary(year: int, month: int, db: Session = Depends(get_db)):
+    return summary_service.compute_summary(db, year, month)
 
 
 @router.put("/opening-balance", response_model=Summary)
 def set_opening_balance(payload: OpeningBalanceIn, db: Session = Depends(get_db)):
     settings_repo.set_opening_balance(
-        db, payload.year, payload.month_id, payload.opening_balance
+        db, payload.year, payload.month, payload.opening_balance
     )
-    return summary_service.compute_summary(db, payload.year, payload.month_id)
+    return summary_service.compute_summary(db, payload.year, payload.month)

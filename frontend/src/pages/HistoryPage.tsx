@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { historyApi } from "../api/resources";
 import { formatMoney } from "../lib/format";
+import { monthName } from "../lib/months";
 
 export function HistoryPage() {
   const { data: rows = [] } = useQuery({
@@ -26,9 +27,9 @@ export function HistoryPage() {
         </thead>
         <tbody>
           {rows.map((r) => (
-            <tr key={`${r.year}-${r.month_id}`}>
+            <tr key={`${r.year}-${r.month}`}>
               <td>
-                {r.month_name} {r.year}
+                {monthName(r.month)} {r.year}
               </td>
               <td style={{ textAlign: "right" }}>{formatMoney(r.plan_income)}</td>
               <td style={{ textAlign: "right" }}>{formatMoney(r.plan_expense)}</td>

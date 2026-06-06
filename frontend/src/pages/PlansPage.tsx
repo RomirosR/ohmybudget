@@ -2,13 +2,13 @@ import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { plansApi } from "../api/resources";
-import { useMonths } from "../hooks/useLookups";
+import { NumberField } from "../components/NumberField";
 import { formatMoney } from "../lib/format";
+import { MONTH_NUMBERS, monthName } from "../lib/months";
 import type { Plan, PlanInput } from "../types";
 
 export function PlansPage() {
   const qc = useQueryClient();
-  const { data: months = [] } = useMonths();
   const { data: plans = [] } = useQuery({
     queryKey: ["plans"],
     queryFn: plansApi.list,
@@ -36,23 +36,18 @@ export function PlansPage() {
 
   // Группировка по (год, месяц), отсортировано по убыванию (новые сверху).
   const groups = useMemo(() => {
-    const orderOf = new Map(months.map((m) => [m.id, m.order_index]));
-    const nameOf = new Map(months.map((m) => [m.id, m.name]));
-    const map = new Map<string, { year: number; monthId: number; rows: Plan[] }>();
+    const map = new Map<string, { year: number; month: number; rows: Plan[] }>();
     for (const p of plans) {
-      const key = `${p.year}-${p.month_id}`;
-      if (!map.has(key))
-        map.set(key, { year: p.year, monthId: p.month_id, rows: [] });
+      const key = `${p.year}-${p.month}`;
+      if (!map.has(key)) map.set(key, { year: p.year, month: p.month, rows: [] });
       map.get(key)!.rows.push(p);
     }
-    return [...map.values()]
-      .sort((a, b) => {
-        const ka = a.year * 100 + (orderOf.get(a.monthId) ?? 0);
-        const kb = b.year * 100 + (orderOf.get(b.monthId) ?? 0);
-        return kb - ka; // новые сверху
-      })
-      .map((g) => ({ ...g, monthName: nameOf.get(g.monthId) ?? "?" }));
-  }, [plans, months]);
+    return [...map.values()].sort((a, b) => {
+      const ka = a.year * 100 + a.month;
+      const kb = b.year * 100 + b.month;
+      return kb - ka; // новые сверху
+    });
+  }, [plans]);
 
   return (
     <div>
@@ -67,18 +62,15 @@ export function PlansPage() {
             План на следующий месяц
           </button>
         </div>
-        <PlanForm
-          onSubmit={(data) => createMut.mutate(data)}
-          defaultMonthId={months[0]?.id ?? 1}
-        />
+        <PlanForm onSubmit={(data) => createMut.mutate(data)} />
       </div>
 
       {groups.length === 0 && <p className="muted">Планов пока нет.</p>}
 
       {groups.map((g) => (
-        <div className="card" key={`${g.year}-${g.monthId}`}>
+        <div className="card" key={`${g.year}-${g.month}`}>
           <h3>
-            {g.monthName} {g.year}
+            {monthName(g.month)} {g.year}
           </h3>
           <table className="data-table">
             <thead>
@@ -115,16 +107,9 @@ export function PlansPage() {
   );
 }
 
-function PlanForm({
-  onSubmit,
-  defaultMonthId,
-}: {
-  onSubmit: (data: PlanInput) => void;
-  defaultMonthId: number;
-}) {
-  const { data: months = [] } = useMonths();
+function PlanForm({ onSubmit }: { onSubmit: (data: PlanInput) => void }) {
   const [year, setYear] = useState(new Date().getFullYear());
-  const [monthId, setMonthId] = useState(defaultMonthId);
+  const [month, setMonth] = useState(1);
   const [category, setCategory] = useState("");
   const [isIncome, setIsIncome] = useState(false);
   const [amount, setAmount] = useState(0);
@@ -135,25 +120,21 @@ function PlanForm({
       onSubmit={(e) => {
         e.preventDefault();
         if (!category) return;
-        onSubmit({ year, month_id: monthId, category, is_income: isIncome, amount });
+        onSubmit({ year, month, category, is_income: isIncome, amount });
         setCategory("");
         setAmount(0);
       }}
     >
       <div className="field">
         <label>Год</label>
-        <input
-          type="number"
-          value={year}
-          onChange={(e) => setYear(Number(e.target.value))}
-        />
+        <NumberField value={year} onChange={setYear} />
       </div>
       <div className="field">
         <label>Месяц</label>
-        <select value={monthId} onChange={(e) => setMonthId(Number(e.target.value))}>
-          {months.map((m) => (
-            <option key={m.id} value={m.id}>
-              {m.name}
+        <select value={month} onChange={(e) => setMonth(Number(e.target.value))}>
+          {MONTH_NUMBERS.map((m) => (
+            <option key={m} value={m}>
+              {monthName(m)}
             </option>
           ))}
         </select>
@@ -174,11 +155,7 @@ function PlanForm({
       </div>
       <div className="field">
         <label>Сумма</label>
-        <input
-          type="number"
-          value={amount}
-          onChange={(e) => setAmount(Number(e.target.value))}
-        />
+        <NumberField value={amount} onChange={setAmount} />
       </div>
       <button className="primary" type="submit">
         Добавить

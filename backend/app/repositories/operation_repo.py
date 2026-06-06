@@ -10,14 +10,14 @@ class OperationRepository(CRUDRepository[Operation]):
         super().__init__(Operation)
 
     def list_for_period(
-        self, db: Session, year: int, month_order: int
+        self, db: Session, year: int, month: int
     ) -> list[Operation]:
-        """Операции за (год, порядковый номер месяца 1..12)."""
+        """Операции за (год, номер месяца 1..12)."""
         return (
             db.query(Operation)
             .filter(
                 extract("year", Operation.date) == year,
-                extract("month", Operation.date) == month_order,
+                extract("month", Operation.date) == month,
             )
             .all()
         )

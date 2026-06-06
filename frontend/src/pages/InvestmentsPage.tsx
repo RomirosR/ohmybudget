@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { investmentsApi } from "../api/resources";
+import { NumberField } from "../components/NumberField";
 import { useSecurityTypes } from "../hooks/useLookups";
 import { formatMoney } from "../lib/format";
 import type { InvestmentInput } from "../types";
@@ -140,27 +141,15 @@ function InvestmentForm({
       </div>
       <div className="field">
         <label>Ставка, %</label>
-        <input
-          type="number"
-          value={annualRate}
-          onChange={(e) => setAnnualRate(Number(e.target.value))}
-        />
+        <NumberField value={annualRate} onChange={setAnnualRate} />
       </div>
       <div className="field">
         <label>Выплат в год</label>
-        <input
-          type="number"
-          value={payouts}
-          onChange={(e) => setPayouts(Number(e.target.value))}
-        />
+        <NumberField value={payouts} onChange={setPayouts} />
       </div>
       <div className="field">
         <label>Текущая стоимость</label>
-        <input
-          type="number"
-          value={currentValue}
-          onChange={(e) => setCurrentValue(Number(e.target.value))}
-        />
+        <NumberField value={currentValue} onChange={setCurrentValue} />
       </div>
       <button className="primary" type="submit">
         Добавить

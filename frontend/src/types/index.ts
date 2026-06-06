@@ -1,11 +1,5 @@
 // TS-типы — зеркало Pydantic-схем бэкенда. Тип Доход/Расход = is_income: boolean.
 
-export interface Month {
-  id: number;
-  name: string;
-  order_index: number;
-}
-
 export interface SecurityType {
   id: number;
   name: string;
@@ -19,7 +13,7 @@ export interface AssetType {
 export interface Plan {
   id: number;
   year: number;
-  month_id: number;
+  month: number; // 1..12
   category: string;
   is_income: boolean;
   amount: number;
@@ -71,14 +65,12 @@ export interface InvestmentList {
 
 export interface MonthRef {
   year: number;
-  month_id: number;
-  month_name: string;
-  order_index: number;
+  month: number; // 1..12
 }
 
 export interface Summary {
   year: number;
-  month_id: number;
+  month: number;
   opening_balance: number;
   plan_income: number;
   plan_expense: number;
@@ -95,9 +87,7 @@ export interface Summary {
 
 export interface HistoryRow {
   year: number;
-  month_id: number;
-  month_name: string;
-  order_index: number;
+  month: number; // 1..12
   plan_income: number;
   plan_expense: number;
   fact_income: number;

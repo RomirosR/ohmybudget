@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { assetsApi } from "../api/resources";
+import { NumberField } from "../components/NumberField";
 import { useAssetTypes } from "../hooks/useLookups";
 import { formatMoney, sortByDate } from "../lib/format";
 import type { AssetInput } from "../types";
@@ -118,11 +119,7 @@ function AssetForm({
       </div>
       <div className="field">
         <label>Сумма</label>
-        <input
-          type="number"
-          value={amount}
-          onChange={(e) => setAmount(Number(e.target.value))}
-        />
+        <NumberField value={amount} onChange={setAmount} />
       </div>
       <button className="primary" type="submit">
         Добавить

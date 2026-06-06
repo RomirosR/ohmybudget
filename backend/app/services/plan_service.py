@@ -2,7 +2,7 @@
 
 from sqlalchemy.orm import Session
 
-from app.models import Month, MonthlyPlan
+from app.models import MonthlyPlan
 from app.repositories.plan_repo import plan_repo
 from app.services.period_util import next_month
 
@@ -16,19 +16,14 @@ def clone_next_month(db: Session) -> list[MonthlyPlan] | None:
     if not months:
         return None
 
-    last_year, last_month_id, _name, last_order = months[-1]
-    new_year, new_order = next_month(last_year, last_order)
+    last_year, last_month = months[-1]
+    new_year, new_month = next_month(last_year, last_month)
 
-    # Находим id месяца-справочника по новому порядковому номеру.
-    new_month = (
-        db.query(Month).filter(Month.order_index == new_order).one()
-    )
-
-    source_rows = plan_repo.list_for_month(db, last_year, last_month_id)
+    source_rows = plan_repo.list_for_month(db, last_year, last_month)
     created = [
         MonthlyPlan(
             year=new_year,
-            month_id=new_month.id,
+            month=new_month,
             category=row.category,
             is_income=row.is_income,
             amount=row.amount,

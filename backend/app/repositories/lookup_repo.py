@@ -1,10 +1,6 @@
 from sqlalchemy.orm import Session
 
-from app.models import AssetType, Month, SecurityType
-
-
-def list_months(db: Session) -> list[Month]:
-    return db.query(Month).order_by(Month.order_index).all()
+from app.models import AssetType, SecurityType
 
 
 def list_security_types(db: Session) -> list[SecurityType]:

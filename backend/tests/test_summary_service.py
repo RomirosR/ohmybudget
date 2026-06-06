@@ -5,14 +5,14 @@ from app.repositories import settings_repo
 from app.services.summary_service import compute_summary
 
 YEAR = 2026
-JAN = 1  # month_id Января (= order_index 1 после сидирования)
+JAN = 1  # номер месяца (Январь)
 
 
-def _add_plan(db, *, is_income, amount, category="X", month_id=JAN):
+def _add_plan(db, *, is_income, amount, category="X", month=JAN):
     db.add(
         MonthlyPlan(
             year=YEAR,
-            month_id=month_id,
+            month=month,
             category=category,
             is_income=is_income,
             amount=amount,

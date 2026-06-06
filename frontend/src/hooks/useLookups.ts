@@ -3,15 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { lookupsApi } from "../api/resources";
 
 // Справочники грузятся один раз и кэшируются надолго (меняются редко).
+// Месяцы справочником не являются — их имена резолвятся из lib/months.
 const LONG_STALE = 1000 * 60 * 60;
-
-export function useMonths() {
-  return useQuery({
-    queryKey: ["months"],
-    queryFn: lookupsApi.months,
-    staleTime: LONG_STALE,
-  });
-}
 
 export function useSecurityTypes() {
   return useQuery({

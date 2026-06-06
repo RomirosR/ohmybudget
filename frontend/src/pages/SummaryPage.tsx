@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { summaryApi } from "../api/resources";
+import { NumberField } from "../components/NumberField";
 import { formatMoney } from "../lib/format";
+import { monthName } from "../lib/months";
 import type { Summary } from "../types";
 
 export function SummaryPage() {
@@ -18,30 +20,29 @@ export function SummaryPage() {
   useEffect(() => {
     if (!selected && months.length > 0) {
       const last = months[months.length - 1];
-      setSelected(`${last.year}-${last.month_id}`);
+      setSelected(`${last.year}-${last.month}`);
     }
   }, [months, selected]);
 
-  const [year, monthId] = selected
+  const [year, month] = selected
     ? selected.split("-").map(Number)
     : [undefined, undefined];
 
   const { data: summary } = useQuery({
-    queryKey: ["summary", year, monthId],
-    queryFn: () => summaryApi.get(year!, monthId!),
-    enabled: year !== undefined && monthId !== undefined,
+    queryKey: ["summary", year, month],
+    queryFn: () => summaryApi.get(year!, month!),
+    enabled: year !== undefined && month !== undefined,
   });
 
-  const [openingInput, setOpeningInput] = useState("");
+  const [opening, setOpening] = useState(0);
   useEffect(() => {
-    if (summary) setOpeningInput(String(summary.opening_balance));
+    if (summary) setOpening(summary.opening_balance);
   }, [summary]);
 
   const openingMut = useMutation({
-    mutationFn: () =>
-      summaryApi.setOpeningBalance(year!, monthId!, Number(openingInput) || 0),
+    mutationFn: () => summaryApi.setOpeningBalance(year!, month!, opening),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["summary", year, monthId] });
+      qc.invalidateQueries({ queryKey: ["summary", year, month] });
     },
   });
 
@@ -54,8 +55,8 @@ export function SummaryPage() {
             <label>Месяц</label>
             <select value={selected} onChange={(e) => setSelected(e.target.value)}>
               {months.map((m) => (
-                <option key={`${m.year}-${m.month_id}`} value={`${m.year}-${m.month_id}`}>
-                  {m.month_name} {m.year}
+                <option key={`${m.year}-${m.month}`} value={`${m.year}-${m.month}`}>
+                  {monthName(m.month)} {m.year}
                 </option>
               ))}
             </select>
@@ -70,11 +71,7 @@ export function SummaryPage() {
           <div className="field" style={{ marginTop: 12 }}>
             <label>Остаток на начало месяца (вводится вручную)</label>
             <div style={{ display: "flex", gap: 8 }}>
-              <input
-                type="number"
-                value={openingInput}
-                onChange={(e) => setOpeningInput(e.target.value)}
-              />
+              <NumberField value={opening} onChange={setOpening} />
               <button className="primary" onClick={() => openingMut.mutate()}>
                 Сохранить
               </button>

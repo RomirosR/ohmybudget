@@ -14,6 +14,7 @@ import {
 } from "recharts";
 
 import { historyApi } from "../api/resources";
+import { monthName } from "../lib/months";
 
 export function ChartsPage() {
   const { data: rows = [] } = useQuery({
@@ -25,7 +26,7 @@ export function ChartsPage() {
   const data = useMemo(
     () =>
       rows.map((r) => ({
-        name: `${r.month_name.slice(0, 3)} ${r.year}`,
+        name: `${monthName(r.month).slice(0, 3)} ${r.year}`,
         "Доходы план": r.plan_income,
         "Доходы факт": r.fact_income,
         "Расходы план": r.plan_expense,

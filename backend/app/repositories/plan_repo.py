@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from app.models import Month, MonthlyPlan
+from app.models import MonthlyPlan
 from app.repositories.base import CRUDRepository
 
 
@@ -9,32 +9,26 @@ class PlanRepository(CRUDRepository[MonthlyPlan]):
         super().__init__(MonthlyPlan)
 
     def list_for_month(
-        self, db: Session, year: int, month_id: int
+        self, db: Session, year: int, month: int
     ) -> list[MonthlyPlan]:
         return (
             db.query(MonthlyPlan)
-            .filter(MonthlyPlan.year == year, MonthlyPlan.month_id == month_id)
+            .filter(MonthlyPlan.year == year, MonthlyPlan.month == month)
             .all()
         )
 
-    def distinct_months(self, db: Session) -> list[tuple[int, int, str, int]]:
-        """Уникальные (year, month_id, month_name, order_index) из планов.
+    def distinct_months(self, db: Session) -> list[tuple[int, int]]:
+        """Уникальные (year, month) из планов, отсортированы хронологически.
 
-        Отсортированы хронологически (год, затем порядок месяца).
+        Месяц — число 1..12, поэтому порядок задаётся им напрямую.
         """
         rows = (
-            db.query(
-                MonthlyPlan.year,
-                MonthlyPlan.month_id,
-                Month.name,
-                Month.order_index,
-            )
-            .join(Month, Month.id == MonthlyPlan.month_id)
+            db.query(MonthlyPlan.year, MonthlyPlan.month)
             .distinct()
-            .order_by(MonthlyPlan.year, Month.order_index)
+            .order_by(MonthlyPlan.year, MonthlyPlan.month)
             .all()
         )
-        return [tuple(r) for r in rows]
+        return [(r[0], r[1]) for r in rows]
 
     def distinct_categories(self, db: Session) -> list[str]:
         rows = (

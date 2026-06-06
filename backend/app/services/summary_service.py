@@ -2,7 +2,6 @@
 
 from sqlalchemy.orm import Session
 
-from app.models import Month
 from app.repositories import settings_repo
 from app.repositories.operation_repo import operation_repo
 from app.repositories.plan_repo import plan_repo
@@ -12,24 +11,16 @@ from app.schemas.summary import MonthRef, Summary
 def list_month_refs(db: Session) -> list[MonthRef]:
     """Уникальные (year, month) из планов, отсортированы по возрастанию."""
     return [
-        MonthRef(
-            year=year,
-            month_id=month_id,
-            month_name=name,
-            order_index=order_index,
-        )
-        for (year, month_id, name, order_index) in plan_repo.distinct_months(db)
+        MonthRef(year=year, month=month)
+        for (year, month) in plan_repo.distinct_months(db)
     ]
 
 
-def compute_summary(db: Session, year: int, month_id: int) -> Summary:
-    month = db.get(Month, month_id)
-    order_index = month.order_index if month else 0
+def compute_summary(db: Session, year: int, month: int) -> Summary:
+    plans = plan_repo.list_for_month(db, year, month)
+    operations = operation_repo.list_for_period(db, year, month)
 
-    plans = plan_repo.list_for_month(db, year, month_id)
-    operations = operation_repo.list_for_period(db, year, order_index)
-
-    opening = settings_repo.get_opening_balance(db, year, month_id)
+    opening = settings_repo.get_opening_balance(db, year, month)
 
     plan_income = sum(p.amount for p in plans if p.is_income)
     plan_expense = sum(p.amount for p in plans if not p.is_income)
@@ -48,7 +39,7 @@ def compute_summary(db: Session, year: int, month_id: int) -> Summary:
 
     return Summary(
         year=year,
-        month_id=month_id,
+        month=month,
         opening_balance=opening,
         plan_income=plan_income,
         plan_expense=plan_expense,

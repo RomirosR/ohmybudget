@@ -3,7 +3,7 @@ from pydantic import BaseModel, ConfigDict
 
 class PlanBase(BaseModel):
     year: int
-    month_id: int
+    month: int  # 1..12
     category: str
     is_income: bool
     amount: float

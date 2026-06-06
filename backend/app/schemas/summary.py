@@ -2,19 +2,17 @@ from pydantic import BaseModel
 
 
 class MonthRef(BaseModel):
-    """Пара (год, месяц) для селекторов Сводки/Истории."""
+    """Пара (год, месяц 1..12) для селекторов Сводки/Истории."""
 
     year: int
-    month_id: int
-    month_name: str
-    order_index: int
+    month: int
 
 
 class Summary(BaseModel):
     """Лист 3: 12 расчётных показателей за выбранный месяц."""
 
     year: int
-    month_id: int
+    month: int
 
     opening_balance: float          # 1. остаток на начало (вручную)
     plan_income: float              # 2. доходы по плану
@@ -32,7 +30,7 @@ class Summary(BaseModel):
 
 class OpeningBalanceIn(BaseModel):
     year: int
-    month_id: int
+    month: int
     opening_balance: float
 
 
@@ -40,9 +38,7 @@ class HistoryRow(BaseModel):
     """Лист 6: строка сводки по одному месяцу."""
 
     year: int
-    month_id: int
-    month_name: str
-    order_index: int
+    month: int
 
     plan_income: float
     plan_expense: float

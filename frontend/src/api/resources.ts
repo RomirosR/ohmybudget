@@ -10,7 +10,6 @@ import type {
   Investment,
   InvestmentInput,
   InvestmentList,
-  Month,
   MonthRef,
   Operation,
   OperationInput,
@@ -21,7 +20,6 @@ import type {
 } from "../types";
 
 export const lookupsApi = {
-  months: () => api.get<Month[]>("/lookups/months"),
   securityTypes: () => api.get<SecurityType[]>("/lookups/security-types"),
   assetTypes: () => api.get<AssetType[]>("/lookups/asset-types"),
 };
@@ -59,12 +57,12 @@ export const investmentsApi = {
 
 export const summaryApi = {
   months: () => api.get<MonthRef[]>("/summary/months"),
-  get: (year: number, monthId: number) =>
-    api.get<Summary>(`/summary?year=${year}&month_id=${monthId}`),
-  setOpeningBalance: (year: number, monthId: number, value: number) =>
+  get: (year: number, month: number) =>
+    api.get<Summary>(`/summary?year=${year}&month=${month}`),
+  setOpeningBalance: (year: number, month: number, value: number) =>
     api.put<Summary>("/summary/opening-balance", {
       year,
-      month_id: monthId,
+      month,
       opening_balance: value,
     }),
 };
