@@ -1,0 +1,20 @@
+services:
+  backend:
+    build: ./backend
+    environment:
+      # SQLite-файл хранится в volume, чтобы данные переживали пересборку.
+      DATABASE_URL: sqlite:////data/ohmybudget.db
+    volumes:
+      - backend-data:/data
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+
+volumes:
+  backend-data:
