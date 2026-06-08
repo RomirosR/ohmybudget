@@ -80,3 +80,15 @@
 **Почему так:** единая точка изоляции — репозиторий + зависимость на роуте.
 
 **Как проверить:** без токена `GET /api/plans` → 403; с токеном → 200.
+
+## Шаг 7 — pytest auth и tenancy (коммит: pending)
+
+**Дата:** 2026-06-08
+
+**Что сделано:**
+- `conftest.py`: тестовый пользователь, `auth_headers`, `auth_client`;
+- `test_auth.py`: register, login, me, tenancy;
+- обновлены smoke/service-тесты под `user_id`;
+- `bcrypt` напрямую вместо `passlib` (совместимость с Python 3.14).
+
+**Как проверить:** `cd backend && pytest` — все тесты зелёные.
