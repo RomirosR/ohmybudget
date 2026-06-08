@@ -3,9 +3,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { summaryApi } from "../api/resources";
 import { NumberField } from "../components/NumberField";
+import { FieldError } from "../components/FieldError";
 import { useGuardedAction } from "../hooks/useGuardedMutation";
 import { formatMoney } from "../lib/format";
 import { monthName } from "../lib/months";
+import { validateBalance } from "../lib/validation";
 import type { Summary } from "../types";
 
 export function SummaryPage() {
@@ -37,6 +39,7 @@ export function SummaryPage() {
   });
 
   const [opening, setOpening] = useState(0);
+  const [openingError, setOpeningError] = useState<string | null>(null);
   useEffect(() => {
     if (summary) setOpening(summary.opening_balance);
   }, [summary]);
@@ -76,11 +79,29 @@ export function SummaryPage() {
         {summary && (
           <div className="field" style={{ marginTop: 12 }}>
             <label>Остаток на начало месяца (вводится вручную)</label>
-            <div style={{ display: "flex", gap: 8 }}>
-              <NumberField value={opening} onChange={setOpening} />
-              <button className="primary" onClick={() => openingMut.mutate()}>
-                Сохранить
-              </button>
+            <div style={{ display: "flex", gap: 8, flexDirection: "column" }}>
+              <div style={{ display: "flex", gap: 8 }}>
+                <NumberField
+                  value={opening}
+                  onChange={setOpening}
+                  allowNegative
+                />
+                <button
+                  className="primary"
+                  onClick={() => {
+                    const err = validateBalance(opening);
+                    if (err) {
+                      setOpeningError(err);
+                      return;
+                    }
+                    setOpeningError(null);
+                    openingMut.mutate();
+                  }}
+                >
+                  Сохранить
+                </button>
+              </div>
+              <FieldError message={openingError} />
             </div>
           </div>
         )}

@@ -3,9 +3,18 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { investmentsApi } from "../api/resources";
 import { NumberField } from "../components/NumberField";
+import { FieldError } from "../components/FieldError";
 import { useGuardedAction } from "../hooks/useGuardedMutation";
 import { useSecurityTypes } from "../hooks/useLookups";
 import { formatMoney } from "../lib/format";
+import {
+  firstError,
+  LIMITS,
+  validateCurrentValue,
+  validateInstrumentName,
+  validatePayouts,
+  validateRate,
+} from "../lib/validation";
 import type { InvestmentInput } from "../types";
 
 export function InvestmentsPage() {
@@ -113,15 +122,26 @@ function InvestmentForm({
   const [annualRate, setAnnualRate] = useState(0);
   const [payouts, setPayouts] = useState(12);
   const [currentValue, setCurrentValue] = useState(0);
+  const [error, setError] = useState<string | null>(null);
 
   return (
     <form
       className="entry-form"
       onSubmit={(e) => {
         e.preventDefault();
-        if (!name) return;
+        const err = firstError(
+          validateInstrumentName(name),
+          validateRate(annualRate),
+          validatePayouts(payouts),
+          validateCurrentValue(currentValue),
+        );
+        if (err) {
+          setError(err);
+          return;
+        }
+        setError(null);
         onSubmit({
-          name,
+          name: name.trim(),
           security_type_id: securityTypeId,
           annual_rate: annualRate,
           payouts_per_year: payouts,
@@ -134,7 +154,11 @@ function InvestmentForm({
     >
       <div className="field">
         <label>Инструмент</label>
-        <input value={name} onChange={(e) => setName(e.target.value)} />
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          maxLength={LIMITS.nameMax}
+        />
       </div>
       <div className="field">
         <label>Тип</label>
@@ -161,6 +185,7 @@ function InvestmentForm({
         <label>Текущая стоимость</label>
         <NumberField value={currentValue} onChange={setCurrentValue} />
       </div>
+      <FieldError message={error} />
       <button className="primary" type="submit">
         Добавить
       </button>

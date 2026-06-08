@@ -36,11 +36,17 @@ async function request<T>(
     let detail = res.statusText;
     try {
       const body = await res.json();
-      detail = body.detail ?? detail;
+      if (Array.isArray(body.detail)) {
+        detail = body.detail
+          .map((e: { msg?: string }) => e.msg ?? String(e))
+          .join("; ");
+      } else {
+        detail = body.detail ?? detail;
+      }
     } catch {
       // тело не JSON — оставляем statusText
     }
-    throw new Error(detail);
+    throw new Error(typeof detail === "string" ? detail : res.statusText);
   }
   if (res.status === 204) return undefined as T;
   return res.json() as Promise<T>;

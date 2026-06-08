@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useState } from "react";
 
 import { useAuth } from "../context/AuthContext";
+import { LIMITS, validateEmail, validatePassword } from "../lib/validation";
 
 export function AuthModal() {
   const { authModal, login, register, closeAuthModal } = useAuth();
@@ -21,11 +22,18 @@ export function AuthModal() {
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
+    const err =
+      validateEmail(email) ?? validatePassword(password, mode);
+    if (err) {
+      setError(err);
+      return;
+    }
     setError(null);
     setPending(true);
     try {
-      if (mode === "login") await login(email, password);
-      else await register(email, password);
+      const trimmedEmail = email.trim();
+      if (mode === "login") await login(trimmedEmail, password);
+      else await register(trimmedEmail, password);
       setEmail("");
       setPassword("");
     } catch (err) {
@@ -49,6 +57,7 @@ export function AuthModal() {
               onChange={(e) => setEmail(e.target.value)}
               required
               autoComplete="email"
+              maxLength={254}
             />
           </label>
           <label>
@@ -58,7 +67,8 @@ export function AuthModal() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              minLength={8}
+              minLength={mode === "register" ? LIMITS.passwordMin : 1}
+              maxLength={LIMITS.passwordMax}
               autoComplete={
                 mode === "login" ? "current-password" : "new-password"
               }

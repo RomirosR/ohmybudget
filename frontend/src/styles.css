@@ -272,6 +272,12 @@ button.danger {
   margin: 0;
 }
 
+.field-error {
+  color: var(--expense);
+  font-size: 13px;
+  margin: 4px 0 0;
+}
+
 .guest-banner {
   margin: 0 0 16px;
   padding: 10px 14px;

@@ -2,7 +2,7 @@
 
 > Ветка: `feature/input-validation`
 
-## Шаг 1 — Backend: Pydantic-ограничения (коммит: TBD)
+## Шаг 1 — Backend: Pydantic-ограничения (коммит: d81caa1)
 
 **Дата:** 2026-06-08
 

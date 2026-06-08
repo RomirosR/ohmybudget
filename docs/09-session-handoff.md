@@ -72,4 +72,5 @@ frontend/src/hooks/useGuardedMutation.ts
 
 ## Следующая задача
 
-_Заполни в новом чате._
+Валидация ввода — ветка `feature/input-validation`, журнал `docs/10-input-validation.md`.
+Коммиты и PR — по запросу пользователя.
