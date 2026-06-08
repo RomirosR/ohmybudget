@@ -3,12 +3,14 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { summaryApi } from "../api/resources";
 import { NumberField } from "../components/NumberField";
+import { useGuardedAction } from "../hooks/useGuardedMutation";
 import { formatMoney } from "../lib/format";
 import { monthName } from "../lib/months";
 import type { Summary } from "../types";
 
 export function SummaryPage() {
   const qc = useQueryClient();
+  const runWithAuth = useGuardedAction();
   const { data: months = [] } = useQuery({
     queryKey: ["summary-months"],
     queryFn: summaryApi.months,
@@ -40,7 +42,11 @@ export function SummaryPage() {
   }, [summary]);
 
   const openingMut = useMutation({
-    mutationFn: () => summaryApi.setOpeningBalance(year!, month!, opening),
+    mutationFn: () =>
+      runWithAuth(
+        () => summaryApi.setOpeningBalance(year!, month!, opening),
+        "Зарегистрируйтесь, чтобы сохранить остаток на начало месяца.",
+      ),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["summary", year, month] });
     },

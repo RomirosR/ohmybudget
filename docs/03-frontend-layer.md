@@ -14,7 +14,8 @@
 ## Авторизация (`src/context/AuthContext.tsx`)
 
 - `AuthProvider` — user state, login/register/logout, `queryClient.clear()` на выход.
-- `LoginPage` — форма входа/регистрации; `App.tsx` показывает её без токена.
+- `AuthModal` — вход/регистрация по кнопке в шапке или при попытке сохранить запись гостем.
+- Гостевой режим: все экраны доступны; мутации через `runWithAuth` (см. `docs/08-guest-mode.md`).
 - Подробности — [`docs/07-auth.md`](07-auth.md).
 
 ## Типы (`src/types/`)

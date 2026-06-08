@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { AuthModal } from "./components/AuthModal";
 import { useAuth } from "./context/AuthContext";
 import { PlansPage } from "./pages/PlansPage";
 import { OperationsPage } from "./pages/OperationsPage";
@@ -8,7 +9,6 @@ import { InvestmentsPage } from "./pages/InvestmentsPage";
 import { AssetsPage } from "./pages/AssetsPage";
 import { HistoryPage } from "./pages/HistoryPage";
 import { ChartsPage } from "./pages/ChartsPage";
-import { LoginPage } from "./pages/LoginPage";
 
 const TABS = [
   { key: "plans", label: "Планы по месяцам", Component: PlansPage },
@@ -21,15 +21,11 @@ const TABS = [
 ] as const;
 
 export function App() {
-  const { user, isLoading, logout } = useAuth();
+  const { user, isLoading, logout, openAuthModal } = useAuth();
   const [active, setActive] = useState<(typeof TABS)[number]["key"]>("plans");
 
   if (isLoading) {
     return <div className="app-main muted">Загрузка…</div>;
-  }
-
-  if (!user) {
-    return <LoginPage />;
   }
 
   const ActiveComponent =
@@ -41,10 +37,32 @@ export function App() {
         <div className="header-row">
           <h1>OhMyBudget</h1>
           <div className="header-user">
-            <span className="muted">{user.email}</span>
-            <button type="button" className="tab" onClick={logout}>
-              Выйти
-            </button>
+            {user ? (
+              <>
+                <span className="muted">{user.email}</span>
+                <button type="button" className="tab" onClick={logout}>
+                  Выйти
+                </button>
+              </>
+            ) : (
+              <>
+                <span className="muted guest-hint">Гостевой режим</span>
+                <button
+                  type="button"
+                  className="tab"
+                  onClick={() => openAuthModal({ mode: "login" })}
+                >
+                  Войти
+                </button>
+                <button
+                  type="button"
+                  className="tab active"
+                  onClick={() => openAuthModal({ mode: "register" })}
+                >
+                  Регистрация
+                </button>
+              </>
+            )}
           </div>
         </div>
         <nav className="tabs">
@@ -60,8 +78,15 @@ export function App() {
         </nav>
       </header>
       <main className="app-main">
+        {!user && (
+          <p className="guest-banner muted">
+            Вы в гостевом режиме: можно просматривать и заполнять формы. Чтобы
+            сохранить запись — войдите или зарегистрируйтесь.
+          </p>
+        )}
         <ActiveComponent />
       </main>
+      <AuthModal />
     </div>
   );
 }

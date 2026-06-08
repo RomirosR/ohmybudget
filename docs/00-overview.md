@@ -73,3 +73,4 @@ backend / данные.
 - `docs/06-postgres-migration.md` — журнал интеграции PostgreSQL (dual-DB).
 - `docs/07-auth.md` — журнал авторизации и изоляции данных.
 - `.cursor/rules/git-and-docs-workflow.mdc` — правила для AI-агентов (ветки, коммиты, docs, PR).
+- `docs/08-guest-mode.md` — журнал гостевого режима (просмотр без входа, сохранение после регистрации).
