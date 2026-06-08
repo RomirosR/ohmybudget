@@ -3,16 +3,19 @@
 Личный бюджет-трекер: планы по месяцам, операции, сводка, инвестиции, активы,
 история и графики. Веб-приложение с изоляцией слоёв (frontend / backend / данные).
 
-- **Backend + данные:** Python + FastAPI + SQLite (SQLAlchemy + Alembic)
+- **Backend + данные:** Python + FastAPI + SQLite/PostgreSQL (SQLAlchemy + Alembic)
 - **Frontend:** React + TypeScript + Vite + TanStack Query + Recharts
+- **Авторизация:** JWT Bearer, мультипользователь, изоляция данных по `user_id`
 
 Подробная документация по архитектуре — в каталоге [`docs/`](docs/).
+Журналы миграции: [`docs/06-postgres-migration.md`](docs/06-postgres-migration.md),
+[`docs/07-auth.md`](docs/07-auth.md).
 
 ## Структура
 
 ```
-backend/    FastAPI + SQLite (модели, репозитории, сервисы-расчёты, API)
-frontend/   React SPA (api-клиент, страницы-«листы», графики)
+backend/    FastAPI + SQLite/PostgreSQL (модели, репозитории, сервисы-расчёты, API)
+frontend/   React SPA (api-клиент, auth, страницы-«листы», графики)
 docs/       выжимка по проекту и слоям
 ```
 
@@ -23,8 +26,10 @@ docker compose up --build
 ```
 - Frontend: http://localhost:5173
 - Backend (Swagger): http://localhost:8000/docs
+- PostgreSQL 16 (данные в volume `postgres-data`)
 
 Миграции и наполнение справочников выполняются автоматически при старте бэкенда.
+При первом открытии UI — регистрация нового пользователя.
 
 ## Локальный запуск
 
@@ -33,9 +38,11 @@ docker compose up --build
 cd backend
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
-alembic upgrade head          # создаёт схему + сидит справочники
+alembic upgrade head          # SQLite по умолчанию; см. .env.example для PostgreSQL
 uvicorn app.main:app --reload # http://127.0.0.1:8000 , Swagger на /docs
 ```
+
+> После обновления с версии без auth: `rm ohmybudget.db && alembic upgrade head`
 
 ### Frontend
 ```bash
@@ -46,10 +53,14 @@ npm run dev                   # http://127.0.0.1:5173 (проксирует /api
 
 > Требуется Node.js (проверено на v22+). На macOS: `brew install node`.
 
+### Переменные окружения
+
+См. [`backend/.env.example`](backend/.env.example): `DATABASE_URL`, `JWT_SECRET`, `JWT_EXPIRE_MINUTES`.
+
 ## Тесты
 
 ```bash
-cd backend && pytest                       # расчёты + smoke API
+cd backend && pytest                       # расчёты + auth + smoke API
 cd frontend && npm run build               # tsc + сборка
 ```
 

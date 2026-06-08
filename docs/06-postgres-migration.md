@@ -70,3 +70,7 @@
 - Alembic совместим с обоими диалектами.
 
 **Как проверить:** `cd backend && alembic upgrade head && pytest` на SQLite.
+
+---
+
+Фаза PostgreSQL завершена. Дальнейшая работа по авторизации — в [`docs/07-auth.md`](07-auth.md).
