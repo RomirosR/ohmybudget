@@ -66,3 +66,17 @@
 `rm backend/ohmybudget.db && alembic upgrade head`.
 
 **Как проверить:** `alembic upgrade head` — колонки `user_id` NOT NULL.
+
+## Шаг 6 — изоляция в repos/routes/services (коммит: pending)
+
+**Дата:** 2026-06-08
+
+**Что сделано:**
+- `CRUDRepository` и спец-репозитории фильтруют по `user_id`;
+- все доменные роуты требуют `get_current_user`;
+- `summary_service`, `history_service`, `plan_service` принимают `user_id`;
+- `/api/lookups/*` остаётся публичным.
+
+**Почему так:** единая точка изоляции — репозиторий + зависимость на роуте.
+
+**Как проверить:** без токена `GET /api/plans` → 403; с токеном → 200.

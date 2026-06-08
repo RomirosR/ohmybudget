@@ -3,6 +3,10 @@
 > FastAPI + Pydantic v2. Делится на бизнес-логику (`services/` — расчёты по спеке) и
 > презентацию (`api/routes/` — HTTP). Контракт наружу — Pydantic-схемы. Про SQL не
 > знает — ходит в данные через `repositories/`.
+>
+> **Авторизация:** JWT Bearer, зависимость `get_current_user`. Все доменные эндпоинты
+> фильтруют данные по `user_id`. Публичные: `/api/health`, `/api/auth/*`, `/api/lookups/*`.
+> Подробности — [`docs/07-auth.md`](07-auth.md).
 
 ## Pydantic-схемы (`schemas/`)
 
@@ -62,6 +66,11 @@ JSON — `is_income: bool`.
 ## API-контракт (`api/routes/`)
 
 ```
+Auth (публичные register/login; me — Bearer)
+  POST   /api/auth/register
+  POST   /api/auth/login
+  GET    /api/auth/me
+
 Lookups
   GET  /api/lookups/months
   GET  /api/lookups/security-types
