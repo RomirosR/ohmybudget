@@ -28,3 +28,16 @@
 без смены кода при переключении SQLite ↔ PostgreSQL.
 
 **Как проверить:** `cd backend && pip install -e .` — пакет `psycopg` в списке зависимостей.
+
+## Шаг 2 — alembic batch mode и pool (коммит: pending)
+
+**Дата:** 2026-06-08
+
+**Что сделано:**
+- `render_as_batch` в `alembic/env.py` включается только для SQLite;
+- для PostgreSQL в `session.py` добавлен `pool_pre_ping=True`.
+
+**Почему так:** batch mode нужен SQLite для ALTER; на PostgreSQL он лишний. `pool_pre_ping`
+восстанавливает соединения после рестарта контейнера postgres.
+
+**Как проверить:** `alembic upgrade head` на SQLite — без ошибок.
