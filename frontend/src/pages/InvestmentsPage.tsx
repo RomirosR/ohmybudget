@@ -3,12 +3,14 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { investmentsApi } from "../api/resources";
 import { NumberField } from "../components/NumberField";
+import { useGuardedAction } from "../hooks/useGuardedMutation";
 import { useSecurityTypes } from "../hooks/useLookups";
 import { formatMoney } from "../lib/format";
 import type { InvestmentInput } from "../types";
 
 export function InvestmentsPage() {
   const qc = useQueryClient();
+  const runWithAuth = useGuardedAction();
   const { data: securityTypes = [] } = useSecurityTypes();
   const { data } = useQuery({
     queryKey: ["investments"],
@@ -17,11 +19,19 @@ export function InvestmentsPage() {
 
   const invalidate = () => qc.invalidateQueries({ queryKey: ["investments"] });
   const createMut = useMutation({
-    mutationFn: (d: InvestmentInput) => investmentsApi.create(d),
+    mutationFn: (d: InvestmentInput) =>
+      runWithAuth(
+        () => investmentsApi.create(d),
+        "Зарегистрируйтесь, чтобы сохранить инвестицию.",
+      ),
     onSuccess: invalidate,
   });
   const deleteMut = useMutation({
-    mutationFn: (id: number) => investmentsApi.remove(id),
+    mutationFn: (id: number) =>
+      runWithAuth(
+        () => investmentsApi.remove(id),
+        "Войдите, чтобы удалять записи.",
+      ),
     onSuccess: invalidate,
   });
 

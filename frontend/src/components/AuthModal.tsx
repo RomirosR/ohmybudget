@@ -1,14 +1,23 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
 import { useAuth } from "../context/AuthContext";
 
-export function LoginPage() {
-  const { login, register } = useAuth();
-  const [mode, setMode] = useState<"login" | "register">("login");
+export function AuthModal() {
+  const { authModal, login, register, closeAuthModal } = useAuth();
+  const [mode, setMode] = useState<"login" | "register">("register");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+
+  useEffect(() => {
+    if (authModal.open) {
+      setMode(authModal.defaultMode);
+      setError(null);
+    }
+  }, [authModal.open, authModal.defaultMode]);
+
+  if (!authModal.open) return null;
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
@@ -17,6 +26,8 @@ export function LoginPage() {
     try {
       if (mode === "login") await login(email, password);
       else await register(email, password);
+      setEmail("");
+      setPassword("");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Ошибка авторизации");
     } finally {
@@ -25,14 +36,10 @@ export function LoginPage() {
   };
 
   return (
-    <div className="login-page">
-      <div className="card login-card">
+    <div className="modal-overlay" onClick={closeAuthModal}>
+      <div className="card login-card modal-card" onClick={(e) => e.stopPropagation()}>
         <h2>{mode === "login" ? "Вход" : "Регистрация"}</h2>
-        <p className="muted">
-          {mode === "login"
-            ? "Войдите, чтобы увидеть свой бюджет"
-            : "Создайте аккаунт для ведения бюджета"}
-        </p>
+        {authModal.message && <p className="muted">{authModal.message}</p>}
         <form onSubmit={submit} className="login-form">
           <label>
             Email
@@ -59,7 +66,11 @@ export function LoginPage() {
           </label>
           {error && <p className="login-error">{error}</p>}
           <button type="submit" className="btn-primary" disabled={pending}>
-            {pending ? "…" : mode === "login" ? "Войти" : "Зарегистрироваться"}
+            {pending
+              ? "…"
+              : mode === "login"
+                ? "Войти и сохранить"
+                : "Зарегистрироваться и сохранить"}
           </button>
         </form>
         <button

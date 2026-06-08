@@ -8,6 +8,26 @@ from app.repositories.plan_repo import plan_repo
 from app.schemas.summary import MonthRef, Summary
 
 
+def empty_summary(year: int, month: int) -> Summary:
+    """Пустая сводка для гостя или месяца без данных."""
+    return Summary(
+        year=year,
+        month=month,
+        opening_balance=0,
+        plan_income=0,
+        plan_expense=0,
+        forecast_plan=0,
+        fact_income=0,
+        fact_expense=0,
+        current_balance=0,
+        deviation_income=0,
+        deviation_expense=0,
+        remaining_plan_income=0,
+        remaining_plan_expense=0,
+        expected_end_balance=0,
+    )
+
+
 def list_month_refs(db: Session, user_id: int) -> list[MonthRef]:
     """Уникальные (year, month) из планов, отсортированы по возрастанию."""
     return [

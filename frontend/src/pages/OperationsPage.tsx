@@ -3,11 +3,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { metaApi, operationsApi } from "../api/resources";
 import { NumberField } from "../components/NumberField";
+import { useGuardedAction } from "../hooks/useGuardedMutation";
 import { formatMoney, sortByDate } from "../lib/format";
 import type { OperationInput } from "../types";
 
 export function OperationsPage() {
   const qc = useQueryClient();
+  const runWithAuth = useGuardedAction();
   const { data: operations = [] } = useQuery({
     queryKey: ["operations"],
     queryFn: operationsApi.list,
@@ -24,11 +26,19 @@ export function OperationsPage() {
   };
 
   const createMut = useMutation({
-    mutationFn: (data: OperationInput) => operationsApi.create(data),
+    mutationFn: (data: OperationInput) =>
+      runWithAuth(
+        () => operationsApi.create(data),
+        "Зарегистрируйтесь, чтобы сохранить операцию.",
+      ),
     onSuccess: invalidate,
   });
   const deleteMut = useMutation({
-    mutationFn: (id: number) => operationsApi.remove(id),
+    mutationFn: (id: number) =>
+      runWithAuth(
+        () => operationsApi.remove(id),
+        "Войдите, чтобы удалять записи.",
+      ),
     onSuccess: invalidate,
   });
 

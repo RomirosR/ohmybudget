@@ -3,12 +3,14 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { plansApi } from "../api/resources";
 import { NumberField } from "../components/NumberField";
+import { useGuardedAction } from "../hooks/useGuardedMutation";
 import { formatMoney } from "../lib/format";
 import { MONTH_NUMBERS, monthName } from "../lib/months";
 import type { Plan, PlanInput } from "../types";
 
 export function PlansPage() {
   const qc = useQueryClient();
+  const runWithAuth = useGuardedAction();
   const { data: plans = [] } = useQuery({
     queryKey: ["plans"],
     queryFn: plansApi.list,
@@ -22,15 +24,27 @@ export function PlansPage() {
   };
 
   const createMut = useMutation({
-    mutationFn: (data: PlanInput) => plansApi.create(data),
+    mutationFn: (data: PlanInput) =>
+      runWithAuth(
+        () => plansApi.create(data),
+        "Зарегистрируйтесь, чтобы сохранить план.",
+      ),
     onSuccess: invalidate,
   });
   const deleteMut = useMutation({
-    mutationFn: (id: number) => plansApi.remove(id),
+    mutationFn: (id: number) =>
+      runWithAuth(
+        () => plansApi.remove(id),
+        "Войдите, чтобы удалять записи.",
+      ),
     onSuccess: invalidate,
   });
   const cloneMut = useMutation({
-    mutationFn: () => plansApi.cloneNext(),
+    mutationFn: () =>
+      runWithAuth(
+        () => plansApi.cloneNext(),
+        "Зарегистрируйтесь, чтобы скопировать план на следующий месяц.",
+      ),
     onSuccess: invalidate,
   });
 

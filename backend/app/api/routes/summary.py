@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from app.api.deps.auth import get_current_user
+from app.api.deps.auth import get_current_user, get_optional_user
 from app.db.session import get_db
 from app.models.user import User
 from app.repositories import settings_repo
@@ -14,8 +14,10 @@ router = APIRouter(prefix="/api/summary", tags=["summary"])
 @router.get("/months", response_model=list[MonthRef])
 def get_months(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User | None = Depends(get_optional_user),
 ):
+    if current_user is None:
+        return []
     return summary_service.list_month_refs(db, current_user.id)
 
 
@@ -24,8 +26,10 @@ def get_summary(
     year: int,
     month: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User | None = Depends(get_optional_user),
 ):
+    if current_user is None:
+        return summary_service.empty_summary(year, month)
     return summary_service.compute_summary(db, current_user.id, year, month)
 
 

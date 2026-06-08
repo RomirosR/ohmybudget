@@ -3,22 +3,32 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { assetsApi } from "../api/resources";
 import { NumberField } from "../components/NumberField";
+import { useGuardedAction } from "../hooks/useGuardedMutation";
 import { useAssetTypes } from "../hooks/useLookups";
 import { formatMoney, sortByDate } from "../lib/format";
 import type { AssetInput } from "../types";
 
 export function AssetsPage() {
   const qc = useQueryClient();
+  const runWithAuth = useGuardedAction();
   const { data: assetTypes = [] } = useAssetTypes();
   const { data } = useQuery({ queryKey: ["assets"], queryFn: assetsApi.list });
 
   const invalidate = () => qc.invalidateQueries({ queryKey: ["assets"] });
   const createMut = useMutation({
-    mutationFn: (d: AssetInput) => assetsApi.create(d),
+    mutationFn: (d: AssetInput) =>
+      runWithAuth(
+        () => assetsApi.create(d),
+        "Зарегистрируйтесь, чтобы сохранить актив.",
+      ),
     onSuccess: invalidate,
   });
   const deleteMut = useMutation({
-    mutationFn: (id: number) => assetsApi.remove(id),
+    mutationFn: (id: number) =>
+      runWithAuth(
+        () => assetsApi.remove(id),
+        "Войдите, чтобы удалять записи.",
+      ),
     onSuccess: invalidate,
   });
 

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app.api.deps.auth import get_current_user
+from app.api.deps.auth import get_current_user, get_optional_user
 from app.db.session import get_db
 from app.models.user import User
 from app.repositories.investment_repo import investment_repo
@@ -19,8 +19,10 @@ router = APIRouter(prefix="/api/investments", tags=["investments"])
 @router.get("", response_model=InvestmentList)
 def list_investments(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User | None = Depends(get_optional_user),
 ):
+    if current_user is None:
+        return InvestmentList(items=[], total_monthly_income=0)
     items = investment_repo.list(db, current_user.id)
     return investment_service.build_list(items)
 
