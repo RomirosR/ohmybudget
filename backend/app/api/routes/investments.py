@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.api.deps.auth import get_current_user, get_optional_user
 from app.db.session import get_db
 from app.models.user import User
+from app.repositories import lookup_repo
 from app.repositories.investment_repo import investment_repo
 from app.schemas.investment import (
     InvestmentCreate,
@@ -33,6 +34,8 @@ def create_investment(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    if not lookup_repo.security_type_exists(db, payload.security_type_id):
+        raise HTTPException(status_code=422, detail="Неизвестный тип ценной бумаги")
     data = {**payload.model_dump(), "user_id": current_user.id}
     obj = investment_repo.create(db, data)
     return investment_service.to_out(obj)
@@ -48,6 +51,8 @@ def update_investment(
     obj = investment_repo.get(db, current_user.id, inv_id)
     if obj is None:
         raise HTTPException(status_code=404, detail="Инструмент не найден")
+    if not lookup_repo.security_type_exists(db, payload.security_type_id):
+        raise HTTPException(status_code=422, detail="Неизвестный тип ценной бумаги")
     obj = investment_repo.update(db, obj, payload.model_dump())
     return investment_service.to_out(obj)
 

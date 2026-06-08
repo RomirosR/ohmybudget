@@ -1,12 +1,14 @@
 from pydantic import BaseModel, ConfigDict
 
+from app.schemas.fields import Category, MoneyAmount, Month, Year
+
 
 class PlanBase(BaseModel):
-    year: int
-    month: int  # 1..12
-    category: str
+    year: Year
+    month: Month
+    category: Category
     is_income: bool
-    amount: float
+    amount: MoneyAmount
 
 
 class PlanCreate(PlanBase):

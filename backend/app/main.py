@@ -1,5 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from sqlalchemy.exc import IntegrityError
 
 from app.api.routes import (
     assets,
@@ -26,6 +28,14 @@ app.add_middleware(
 
 for module in (auth, lookups, plans, operations, assets, investments, summary, history, meta):
     app.include_router(module.router)
+
+
+@app.exception_handler(IntegrityError)
+async def integrity_error_handler(_request: Request, _exc: IntegrityError):
+    return JSONResponse(
+        status_code=422,
+        content={"detail": "Некорректная ссылка на справочник или дубликат записи"},
+    )
 
 
 @app.get("/api/health")

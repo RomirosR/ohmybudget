@@ -5,6 +5,7 @@ from app.api.deps.auth import get_current_user, get_optional_user
 from app.db.session import get_db
 from app.models.user import User
 from app.repositories import settings_repo
+from app.schemas.fields import Month, Year
 from app.schemas.summary import MonthRef, OpeningBalanceIn, Summary
 from app.services import summary_service
 
@@ -23,8 +24,8 @@ def get_months(
 
 @router.get("", response_model=Summary)
 def get_summary(
-    year: int,
-    month: int,
+    year: Year,
+    month: Month,
     db: Session = Depends(get_db),
     current_user: User | None = Depends(get_optional_user),
 ):
