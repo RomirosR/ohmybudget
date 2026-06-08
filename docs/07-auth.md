@@ -15,3 +15,15 @@
 **Почему так:** email как уникальный логин; пароль только в виде bcrypt-хэша.
 
 **Как проверить:** `alembic upgrade head` — таблица `users` создана.
+
+## Шаг 2 — JWT config и security (коммит: pending)
+
+**Дата:** 2026-06-08
+
+**Что сделано:**
+- `jwt_secret`, `jwt_expire_minutes` в `core/config.py`;
+- `core/security.py`: hash/verify password, create/decode JWT (HS256).
+
+**Почему так:** dev-default secret для локальной разработки; prod — через `JWT_SECRET` env.
+
+**Как проверить:** unit-проверка encode/decode в pytest (шаг 7).
