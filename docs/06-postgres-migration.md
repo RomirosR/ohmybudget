@@ -55,3 +55,18 @@
 остаётся SQLite по умолчанию.
 
 **Как проверить:** `docker compose up --build` — backend стартует после postgres healthy.
+
+## Шаг 4 — итог фазы PostgreSQL (коммит: pending)
+
+**Дата:** 2026-06-08
+
+**Что сделано:** обновлены `docs/00-overview.md` и `docs/01-data-layer.md` — dual-DB
+зафиксирован в архитектуре.
+
+**Итог фазы:**
+- локально / pytest — SQLite (без установки PostgreSQL);
+- Docker Compose — PostgreSQL 16;
+- переключение только через `DATABASE_URL`;
+- Alembic совместим с обоими диалектами.
+
+**Как проверить:** `cd backend && alembic upgrade head && pytest` на SQLite.

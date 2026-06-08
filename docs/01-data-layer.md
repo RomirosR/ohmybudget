@@ -1,7 +1,9 @@
 # Слой данных
 
-> SQLite + SQLAlchemy 2.0 + Alembic. Единственный слой, знающий про SQL. Наружу
-> отдаёт данные только через `repositories/` (ORM-детали не утекают выше).
+> Dual-DB: SQLite (локальная разработка, pytest) / PostgreSQL (Docker Compose).
+> SQLAlchemy 2.0 + Alembic. Единственный слой, знающий про SQL. Наружу отдаёт данные
+> только через `repositories/` (ORM-детали не утекают выше).
+> Журнал миграции — [`docs/06-postgres-migration.md`](06-postgres-migration.md).
 
 ## Принципы
 
