@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.api.deps.auth import get_current_user, get_optional_user
 from app.db.session import get_db
 from app.models.user import User
+from app.repositories import lookup_repo
 from app.repositories.asset_repo import asset_repo
 from app.schemas.asset import AssetCreate, AssetList, AssetOut, AssetUpdate
 from app.services import asset_service
@@ -28,6 +29,8 @@ def create_asset(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    if not lookup_repo.asset_type_exists(db, payload.asset_type_id):
+        raise HTTPException(status_code=422, detail="Неизвестный тип актива")
     data = {**payload.model_dump(), "user_id": current_user.id}
     return asset_repo.create(db, data)
 
@@ -42,6 +45,8 @@ def update_asset(
     obj = asset_repo.get(db, current_user.id, asset_id)
     if obj is None:
         raise HTTPException(status_code=404, detail="Актив не найден")
+    if not lookup_repo.asset_type_exists(db, payload.asset_type_id):
+        raise HTTPException(status_code=422, detail="Неизвестный тип актива")
     return asset_repo.update(db, obj, payload.model_dump())
 
 

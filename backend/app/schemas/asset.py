@@ -2,11 +2,13 @@ from datetime import date
 
 from pydantic import BaseModel, ConfigDict
 
+from app.schemas.fields import LookupId, MoneyAmount
+
 
 class AssetBase(BaseModel):
     date: date
-    asset_type_id: int
-    amount: float
+    asset_type_id: LookupId
+    amount: MoneyAmount
 
 
 class AssetCreate(AssetBase):

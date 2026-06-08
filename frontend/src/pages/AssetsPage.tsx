@@ -3,9 +3,15 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { assetsApi } from "../api/resources";
 import { NumberField } from "../components/NumberField";
+import { FieldError } from "../components/FieldError";
 import { useGuardedAction } from "../hooks/useGuardedMutation";
 import { useAssetTypes } from "../hooks/useLookups";
 import { formatMoney, sortByDate } from "../lib/format";
+import {
+  firstError,
+  validateDate,
+  validateMoney,
+} from "../lib/validation";
 import type { AssetInput } from "../types";
 
 export function AssetsPage() {
@@ -100,12 +106,22 @@ function AssetForm({
   const [date, setDate] = useState(today);
   const [assetTypeId, setAssetTypeId] = useState(defaultTypeId);
   const [amount, setAmount] = useState(0);
+  const [error, setError] = useState<string | null>(null);
 
   return (
     <form
       className="entry-form"
       onSubmit={(e) => {
         e.preventDefault();
+        const err = firstError(
+          validateDate(date),
+          validateMoney(amount),
+        );
+        if (err) {
+          setError(err);
+          return;
+        }
+        setError(null);
         onSubmit({ date, asset_type_id: assetTypeId, amount });
         setAmount(0);
       }}
@@ -131,6 +147,7 @@ function AssetForm({
         <label>Сумма</label>
         <NumberField value={amount} onChange={setAmount} />
       </div>
+      <FieldError message={error} />
       <button className="primary" type="submit">
         Добавить
       </button>

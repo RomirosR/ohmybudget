@@ -3,9 +3,17 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { plansApi } from "../api/resources";
 import { NumberField } from "../components/NumberField";
+import { FieldError } from "../components/FieldError";
 import { useGuardedAction } from "../hooks/useGuardedMutation";
 import { formatMoney } from "../lib/format";
 import { MONTH_NUMBERS, monthName } from "../lib/months";
+import {
+  firstError,
+  LIMITS,
+  validateCategory,
+  validateMoney,
+  validateYear,
+} from "../lib/validation";
 import type { Plan, PlanInput } from "../types";
 
 export function PlansPage() {
@@ -127,21 +135,37 @@ function PlanForm({ onSubmit }: { onSubmit: (data: PlanInput) => void }) {
   const [category, setCategory] = useState("");
   const [isIncome, setIsIncome] = useState(false);
   const [amount, setAmount] = useState(0);
+  const [error, setError] = useState<string | null>(null);
 
   return (
     <form
       className="entry-form"
       onSubmit={(e) => {
         e.preventDefault();
-        if (!category) return;
-        onSubmit({ year, month, category, is_income: isIncome, amount });
+        const err = firstError(
+          validateYear(year),
+          validateCategory(category),
+          validateMoney(amount),
+        );
+        if (err) {
+          setError(err);
+          return;
+        }
+        setError(null);
+        onSubmit({
+          year,
+          month,
+          category: category.trim(),
+          is_income: isIncome,
+          amount,
+        });
         setCategory("");
         setAmount(0);
       }}
     >
       <div className="field">
         <label>Год</label>
-        <NumberField value={year} onChange={setYear} />
+        <NumberField value={year} onChange={setYear} integerOnly />
       </div>
       <div className="field">
         <label>Месяц</label>
@@ -155,7 +179,11 @@ function PlanForm({ onSubmit }: { onSubmit: (data: PlanInput) => void }) {
       </div>
       <div className="field">
         <label>Категория</label>
-        <input value={category} onChange={(e) => setCategory(e.target.value)} />
+        <input
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          maxLength={LIMITS.categoryMax}
+        />
       </div>
       <div className="field">
         <label>Тип</label>
@@ -171,6 +199,7 @@ function PlanForm({ onSubmit }: { onSubmit: (data: PlanInput) => void }) {
         <label>Сумма</label>
         <NumberField value={amount} onChange={setAmount} />
       </div>
+      <FieldError message={error} />
       <button className="primary" type="submit">
         Добавить
       </button>

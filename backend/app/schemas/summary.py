@@ -1,11 +1,13 @@
 from pydantic import BaseModel
 
+from app.schemas.fields import Balance, Month, Year
+
 
 class MonthRef(BaseModel):
     """Пара (год, месяц 1..12) для селекторов Сводки/Истории."""
 
-    year: int
-    month: int
+    year: Year
+    month: Month
 
 
 class Summary(BaseModel):
@@ -29,9 +31,9 @@ class Summary(BaseModel):
 
 
 class OpeningBalanceIn(BaseModel):
-    year: int
-    month: int
-    opening_balance: float
+    year: Year
+    month: Month
+    opening_balance: Balance
 
 
 class HistoryRow(BaseModel):

@@ -14,6 +14,7 @@
 Единый источник правды контракта; TS-типы фронта их зеркалят. Тип Доход/Расход в
 JSON — `is_income: bool`.
 
+- `fields.py` — общие ограничения полей (`Year`, `Month`, `Category`, `MoneyAmount` …).
 - `lookups.py` — `Month`, `SecurityType`, `AssetType`.
 - `plan.py` — Plan (read/create/update).
 - `operation.py`, `investment.py`, `asset.py` — аналогично.

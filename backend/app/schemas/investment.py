@@ -1,12 +1,20 @@
 from pydantic import BaseModel, ConfigDict
 
+from app.schemas.fields import (
+    AnnualRate,
+    CurrentValue,
+    InstrumentName,
+    LookupId,
+    PayoutsPerYear,
+)
+
 
 class InvestmentBase(BaseModel):
-    name: str
-    security_type_id: int
-    annual_rate: float  # проценты
-    payouts_per_year: float
-    current_value: float
+    name: InstrumentName
+    security_type_id: LookupId
+    annual_rate: AnnualRate
+    payouts_per_year: PayoutsPerYear
+    current_value: CurrentValue
 
 
 class InvestmentCreate(InvestmentBase):

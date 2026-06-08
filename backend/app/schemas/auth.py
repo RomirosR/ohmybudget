@@ -1,16 +1,18 @@
 from datetime import datetime
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr
+
+from app.schemas.fields import LoginPassword, Password
 
 
 class RegisterRequest(BaseModel):
     email: EmailStr
-    password: str = Field(min_length=8, max_length=128)
+    password: Password
 
 
 class LoginRequest(BaseModel):
     email: EmailStr
-    password: str
+    password: LoginPassword
 
 
 class TokenResponse(BaseModel):

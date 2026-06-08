@@ -3,8 +3,17 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { metaApi, operationsApi } from "../api/resources";
 import { NumberField } from "../components/NumberField";
+import { FieldError } from "../components/FieldError";
 import { useGuardedAction } from "../hooks/useGuardedMutation";
 import { formatMoney, sortByDate } from "../lib/format";
+import {
+  firstError,
+  LIMITS,
+  validateCategory,
+  validateDate,
+  validateDescription,
+  validateMoney,
+} from "../lib/validation";
 import type { OperationInput } from "../types";
 
 export function OperationsPage() {
@@ -104,14 +113,31 @@ function OperationForm({
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState(0);
+  const [error, setError] = useState<string | null>(null);
 
   return (
     <form
       className="entry-form"
       onSubmit={(e) => {
         e.preventDefault();
-        if (!category) return;
-        onSubmit({ date, is_income: isIncome, category, description, amount });
+        const err = firstError(
+          validateDate(date),
+          validateCategory(category),
+          validateDescription(description),
+          validateMoney(amount),
+        );
+        if (err) {
+          setError(err);
+          return;
+        }
+        setError(null);
+        onSubmit({
+          date,
+          is_income: isIncome,
+          category: category.trim(),
+          description: description.trim(),
+          amount,
+        });
         setDescription("");
         setAmount(0);
       }}
@@ -136,6 +162,7 @@ function OperationForm({
           list="category-options"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
+          maxLength={LIMITS.categoryMax}
         />
         <datalist id="category-options">
           {categories.map((c) => (
@@ -145,12 +172,17 @@ function OperationForm({
       </div>
       <div className="field">
         <label>Описание</label>
-        <input value={description} onChange={(e) => setDescription(e.target.value)} />
+        <input
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          maxLength={LIMITS.descriptionMax}
+        />
       </div>
       <div className="field">
         <label>Сумма</label>
         <NumberField value={amount} onChange={setAmount} />
       </div>
+      <FieldError message={error} />
       <button className="primary" type="submit">
         Добавить
       </button>
