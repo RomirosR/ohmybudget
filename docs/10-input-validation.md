@@ -27,7 +27,7 @@ cd backend && pytest tests/test_validation.py
 curl -X POST .../api/plans -d '{"year":2026,"month":13,...}'  # → 422
 ```
 
-## Шаг 2 — Frontend: клиентская валидация (коммит: TBD)
+## Шаг 2 — Frontend: клиентская валидация (коммит: 648a038)
 
 **Дата:** 2026-06-08
 
