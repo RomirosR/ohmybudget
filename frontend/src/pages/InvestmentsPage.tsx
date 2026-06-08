@@ -179,7 +179,7 @@ function InvestmentForm({
       </div>
       <div className="field">
         <label>Выплат в год</label>
-        <NumberField value={payouts} onChange={setPayouts} />
+        <NumberField value={payouts} onChange={setPayouts} integerOnly />
       </div>
       <div className="field">
         <label>Текущая стоимость</label>

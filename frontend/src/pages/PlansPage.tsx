@@ -165,7 +165,7 @@ function PlanForm({ onSubmit }: { onSubmit: (data: PlanInput) => void }) {
     >
       <div className="field">
         <label>Год</label>
-        <NumberField value={year} onChange={setYear} />
+        <NumberField value={year} onChange={setYear} integerOnly />
       </div>
       <div className="field">
         <label>Месяц</label>
