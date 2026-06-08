@@ -5,10 +5,16 @@ from sqlalchemy.pool import StaticPool
 from sqlalchemy.orm import sessionmaker
 
 import app.models  # noqa: F401 — регистрирует таблицы в Base.metadata
+from app.core.security import create_access_token, hash_password
 from app.db.base import Base
 from app.db.seed import seed_lookups
 from app.db.session import get_db
 from app.main import app
+from app.models.user import User
+
+TEST_USER_ID = 1
+TEST_USER_EMAIL = "test@example.com"
+TEST_USER_PASSWORD = "password123"
 
 
 @pytest.fixture()
@@ -17,12 +23,20 @@ def db_session():
     engine = create_engine(
         "sqlite://",
         connect_args={"check_same_thread": False},
-        poolclass=StaticPool,  # один shared connection → одна in-memory БД
+        poolclass=StaticPool,
     )
     Base.metadata.create_all(engine)
     TestingSession = sessionmaker(bind=engine, autoflush=False, autocommit=False)
     db = TestingSession()
     seed_lookups(db)
+    db.add(
+        User(
+            id=TEST_USER_ID,
+            email=TEST_USER_EMAIL,
+            hashed_password=hash_password(TEST_USER_PASSWORD),
+        )
+    )
+    db.commit()
     try:
         yield db
     finally:
@@ -42,3 +56,15 @@ def client(db_session):
         yield TestClient(app)
     finally:
         app.dependency_overrides.clear()
+
+
+@pytest.fixture()
+def auth_headers(db_session):
+    return {"Authorization": f"Bearer {create_access_token(TEST_USER_ID)}"}
+
+
+@pytest.fixture()
+def auth_client(client, auth_headers):
+    for key, value in auth_headers.items():
+        client.headers[key] = value
+    return client

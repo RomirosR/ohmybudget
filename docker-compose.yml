@@ -1,11 +1,25 @@
 services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ohmybudget
+      POSTGRES_PASSWORD: ohmybudget
+      POSTGRES_DB: ohmybudget
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ohmybudget -d ohmybudget"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   backend:
     build: ./backend
+    depends_on:
+      postgres:
+        condition: service_healthy
     environment:
-      # SQLite-файл хранится в volume, чтобы данные переживали пересборку.
-      DATABASE_URL: sqlite:////data/ohmybudget.db
-    volumes:
-      - backend-data:/data
+      DATABASE_URL: postgresql+psycopg://ohmybudget:ohmybudget@postgres:5432/ohmybudget
     ports:
       - "8000:8000"
 
@@ -17,4 +31,4 @@ services:
       - "5173:80"
 
 volumes:
-  backend-data:
+  postgres-data:

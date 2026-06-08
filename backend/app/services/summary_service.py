@@ -8,19 +8,19 @@ from app.repositories.plan_repo import plan_repo
 from app.schemas.summary import MonthRef, Summary
 
 
-def list_month_refs(db: Session) -> list[MonthRef]:
+def list_month_refs(db: Session, user_id: int) -> list[MonthRef]:
     """Уникальные (year, month) из планов, отсортированы по возрастанию."""
     return [
         MonthRef(year=year, month=month)
-        for (year, month) in plan_repo.distinct_months(db)
+        for (year, month) in plan_repo.distinct_months(db, user_id)
     ]
 
 
-def compute_summary(db: Session, year: int, month: int) -> Summary:
-    plans = plan_repo.list_for_month(db, year, month)
-    operations = operation_repo.list_for_period(db, year, month)
+def compute_summary(db: Session, user_id: int, year: int, month: int) -> Summary:
+    plans = plan_repo.list_for_month(db, user_id, year, month)
+    operations = operation_repo.list_for_period(db, user_id, year, month)
 
-    opening = settings_repo.get_opening_balance(db, year, month)
+    opening = settings_repo.get_opening_balance(db, user_id, year, month)
 
     plan_income = sum(p.amount for p in plans if p.is_income)
     plan_expense = sum(p.amount for p in plans if not p.is_income)

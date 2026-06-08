@@ -1,15 +1,37 @@
 // Базовая обёртка над fetch. В dev Vite проксирует /api → backend :8000.
 
 const BASE = "/api";
+const TOKEN_KEY = "ohmybudget_token";
+
+let onUnauthorized: (() => void) | null = null;
+
+export function setOnUnauthorized(handler: (() => void) | null) {
+  onUnauthorized = handler;
+}
+
+export function getToken(): string | null {
+  return localStorage.getItem(TOKEN_KEY);
+}
+
+export function setToken(token: string | null) {
+  if (token) localStorage.setItem(TOKEN_KEY, token);
+  else localStorage.removeItem(TOKEN_KEY);
+}
 
 async function request<T>(
   path: string,
   options: RequestInit = {},
 ): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, {
-    headers: { "Content-Type": "application/json" },
-    ...options,
-  });
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...(options.headers as Record<string, string>),
+  };
+  const token = getToken();
+  if (token) headers.Authorization = `Bearer ${token}`;
+
+  const res = await fetch(`${BASE}${path}`, { ...options, headers });
+  if (res.status === 401 && onUnauthorized) onUnauthorized();
+
   if (!res.ok) {
     let detail = res.statusText;
     try {

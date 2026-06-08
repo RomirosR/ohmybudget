@@ -7,6 +7,7 @@ from app.models.month_setting import MonthSetting
 from app.models.operation import Operation
 from app.models.plan import MonthlyPlan
 from app.models.security_type import SecurityType
+from app.models.user import User
 
 __all__ = [
     "Asset",
@@ -16,4 +17,5 @@ __all__ = [
     "Operation",
     "MonthlyPlan",
     "SecurityType",
+    "User",
 ]

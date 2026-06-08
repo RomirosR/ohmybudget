@@ -16,11 +16,15 @@ class CRUDRepository(Generic[ModelT]):
     def __init__(self, model: type[ModelT]):
         self.model = model
 
-    def list(self, db: Session) -> list[ModelT]:
-        return db.query(self.model).all()
+    def list(self, db: Session, user_id: int) -> list[ModelT]:
+        return db.query(self.model).filter(self.model.user_id == user_id).all()
 
-    def get(self, db: Session, obj_id: int) -> ModelT | None:
-        return db.get(self.model, obj_id)
+    def get(self, db: Session, user_id: int, obj_id: int) -> ModelT | None:
+        return (
+            db.query(self.model)
+            .filter(self.model.id == obj_id, self.model.user_id == user_id)
+            .one_or_none()
+        )
 
     def create(self, db: Session, data: dict) -> ModelT:
         obj = self.model(**data)

@@ -20,5 +20,9 @@ class Settings(BaseSettings):
         "http://127.0.0.1:5173",
     ]
 
+    # JWT: в production задайте JWT_SECRET через env (см. .env.example).
+    jwt_secret: str = "dev-insecure-change-me"
+    jwt_expire_minutes: int = 60 * 24 * 7  # 7 дней
+
 
 settings = Settings()

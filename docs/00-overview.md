@@ -23,7 +23,7 @@ backend / данные.
 
 | Слой      | Технологии                                            |
 |-----------|-------------------------------------------------------|
-| Данные    | SQLite + SQLAlchemy 2.0 + Alembic                     |
+| Данные    | SQLite (local/pytest) / PostgreSQL (Docker) + SQLAlchemy 2.0 + Alembic |
 | Backend   | Python (3.11+, локально 3.14) + FastAPI + Pydantic v2 |
 | Frontend  | React + TypeScript + Vite + TanStack Query + Recharts |
 | Запуск    | Docker Compose **и** локальный (uvicorn + npm)        |
@@ -38,7 +38,7 @@ backend / данные.
    - Данные: `models/` + `repositories/` — единственные, кто знает про SQL.
    - Backend-логика: `services/` (расчёты) + `api/routes/` (HTTP). Наружу — Pydantic.
    - Frontend: общается с бэком только через `src/api/` (REST/JSON), про БД не знает.
-3. **Single-tenant** — авторизации нет, один пользователь.
+3. **Multi-tenant** — JWT Bearer, данные изолированы по `user_id` (см. `docs/07-auth.md`).
 
 ## Решения по итогам ревью (отличаются от наивной трактовки спеки)
 
@@ -70,3 +70,5 @@ backend / данные.
 - `docs/03-frontend-layer.md` — frontend (экраны, компоненты, API-клиент).
 - `docs/04-infra-run.md` — запуск (Docker / локально), тестирование.
 - `docs/05-todo.md` — чеклист реализации.
+- `docs/06-postgres-migration.md` — журнал интеграции PostgreSQL (dual-DB).
+- `docs/07-auth.md` — журнал авторизации и изоляции данных.

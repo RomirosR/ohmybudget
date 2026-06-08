@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routes import (
     assets,
+    auth,
     history,
     investments,
     lookups,
@@ -23,7 +24,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-for module in (lookups, plans, operations, assets, investments, summary, history, meta):
+for module in (auth, lookups, plans, operations, assets, investments, summary, history, meta):
     app.include_router(module.router)
 
 

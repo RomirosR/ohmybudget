@@ -50,6 +50,14 @@
 - [ ] `ChartsPage` (Recharts по /api/history).
 
 ## 8. Инфра и финал
-- [ ] Backend `Dockerfile`, frontend `Dockerfile`, `docker-compose.yml`.
-- [ ] `README.md` (оба способа запуска, миграции, seed).
+- [x] Backend `Dockerfile`, frontend `Dockerfile`, `docker-compose.yml`.
+- [x] `README.md` (оба способа запуска, миграции, seed).
 - [ ] Финальный e2e-прогон по сценарию из `docs/04-infra-run.md`.
+
+## 9. PostgreSQL + авторизация (ветка `feature/postgres-auth`)
+- [x] Dual-DB: PostgreSQL в Docker, SQLite локально/pytest — журнал `docs/06-postgres-migration.md`.
+- [x] JWT auth: register/login/me, `get_current_user` — журнал `docs/07-auth.md`.
+- [x] `user_id` на доменных таблицах, изоляция в repos/routes/services.
+- [x] Frontend: LoginPage, AuthContext, Bearer в `client.ts`.
+- [x] pytest: auth + tenancy; `npm run build`.
+- [ ] PR в `main`, e2e с двумя пользователями.
