@@ -9,7 +9,7 @@
 ## Текущее состояние репозитория
 
 - **Ветка:** `main` (= `origin/main`)
-- **Последний merge:** `c0167b9` — guest mode (PR #2)
+- **Последний merge:** `060cae6` — input validation (PR #4); правила агентов (PR #3)
 - **Репо:** https://github.com/RomirosR/ohmybudget
 
 ## Что уже в main
@@ -19,6 +19,7 @@
 | PostgreSQL dual-DB | SQLite локально/pytest, PG в Docker | `docs/06-postgres-migration.md` |
 | JWT multi-user | register/login/me, `user_id` на сущностях | `docs/07-auth.md` |
 | Guest mode | все вкладки без входа; сохранение после регистрации | `docs/08-guest-mode.md` |
+| Input validation | Pydantic + формы, подсказки у числовых полей | `docs/10-input-validation.md` |
 | Agent workflow | ветка/коммиты/docs/PR | `.cursor/rules/git-and-docs-workflow.mdc` |
 
 ## Архитектура (кратко)
@@ -43,7 +44,7 @@ cd frontend && npm run dev
 ## Тесты
 
 ```bash
-cd backend && pytest          # 29 тестов
+cd backend && pytest          # 39 тестов
 cd frontend && npm run build
 ```
 
@@ -51,7 +52,7 @@ cd frontend && npm run build
 
 1. `git checkout main && git pull`
 2. `git checkout -b feature/<имя>`
-3. Атомарные коммиты + документация (журнал в `docs/` или обновление слойных docs)
+3. Атомарные коммиты + документация (журнал в `docs/` или обновление слойных docs); коммитить по ходу работы
 4. PR в `main`, merge по запросу пользователя
 
 ## Ключевые файлы
@@ -72,5 +73,4 @@ frontend/src/hooks/useGuardedMutation.ts
 
 ## Следующая задача
 
-Валидация ввода — ветка `feature/input-validation`, журнал `docs/10-input-validation.md`.
-Коммиты и PR — по запросу пользователя.
+_Заполни в новом чате._
