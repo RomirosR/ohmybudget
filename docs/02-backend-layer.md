@@ -4,8 +4,9 @@
 > презентацию (`api/routes/` — HTTP). Контракт наружу — Pydantic-схемы. Про SQL не
 > знает — ходит в данные через `repositories/`.
 >
-> **Авторизация:** JWT Bearer, зависимость `get_current_user`. Все доменные эндпоинты
-> фильтруют данные по `user_id`. Публичные: `/api/health`, `/api/auth/*`, `/api/lookups/*`.
+> **Авторизация:** JWT Bearer. GET доменных ресурсов — `get_optional_user` (гость → пустые
+> данные); POST/PUT/DELETE — `get_current_user`. Публичные: `/api/health`, `/api/auth/*`,
+> `/api/lookups/*`. Гостевой режим — `docs/08-guest-mode.md`.
 > Подробности — [`docs/07-auth.md`](07-auth.md).
 
 ## Pydantic-схемы (`schemas/`)

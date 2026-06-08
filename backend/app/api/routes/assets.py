@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app.api.deps.auth import get_current_user
+from app.api.deps.auth import get_current_user, get_optional_user
 from app.db.session import get_db
 from app.models.user import User
 from app.repositories.asset_repo import asset_repo
@@ -14,8 +14,10 @@ router = APIRouter(prefix="/api/assets", tags=["assets"])
 @router.get("", response_model=AssetList)
 def list_assets(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User | None = Depends(get_optional_user),
 ):
+    if current_user is None:
+        return AssetList(items=[], total=0)
     items = asset_repo.list(db, current_user.id)
     return AssetList(items=items, total=asset_service.total(items))
 

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app.api.deps.auth import get_current_user
+from app.api.deps.auth import get_current_user, get_optional_user
 from app.db.session import get_db
 from app.models.user import User
 from app.repositories.operation_repo import operation_repo
@@ -13,8 +13,10 @@ router = APIRouter(prefix="/api/operations", tags=["operations"])
 @router.get("", response_model=list[OperationOut])
 def list_operations(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User | None = Depends(get_optional_user),
 ):
+    if current_user is None:
+        return []
     return operation_repo.list(db, current_user.id)
 
 

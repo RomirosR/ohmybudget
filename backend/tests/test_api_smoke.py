@@ -7,8 +7,20 @@ def test_lookups_seeded(client):
     assert len(client.get("/api/lookups/asset-types").json()) == 6
 
 
-def test_plans_require_auth(client):
-    assert client.get("/api/plans").status_code in (401, 403)
+def test_plans_guest_read_empty(client):
+    assert client.get("/api/plans").status_code == 200
+    assert client.get("/api/plans").json() == []
+
+
+def test_plans_create_requires_auth(client):
+    r = client.post(
+        "/api/plans",
+        json={
+            "year": 2026, "month": 1, "category": "X",
+            "is_income": True, "amount": 1,
+        },
+    )
+    assert r.status_code in (401, 403)
 
 
 def test_plan_crud_and_summary(auth_client):
