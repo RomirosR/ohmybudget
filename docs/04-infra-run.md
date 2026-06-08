@@ -29,14 +29,18 @@ npm run dev                     # http://127.0.0.1:5173 , проксирует /
 ```
 docker compose up --build
 ```
-- сервис `backend` — uvicorn на :8000, SQLite-файл в volume, справочники наполняются
-  при старте;
-- сервис `frontend` — Vite/nginx, проксирует `/api` на backend.
+- сервис `postgres` — PostgreSQL 16, данные в volume `postgres-data`;
+- сервис `backend` — uvicorn на :8000, подключается к postgres, миграции при старте;
+- сервис `frontend` — nginx, проксирует `/api` на backend.
+
+Подробности dual-DB — в [`docs/06-postgres-migration.md`](06-postgres-migration.md).
 
 ## Переменные окружения
 
-- `DATABASE_URL` (бэк) — путь к SQLite (по умолчанию файл в `backend/`).
-- baseURL фронта — dev через прокси Vite; в Docker — через nginx/переменную.
+- `DATABASE_URL` (бэк) — SQLite по умолчанию (`backend/ohmybudget.db`); в Docker Compose —
+  `postgresql+psycopg://…`. Пример — `backend/.env.example`.
+- `JWT_SECRET`, `JWT_EXPIRE_MINUTES` — для авторизации (см. `docs/07-auth.md`).
+- baseURL фронта — dev через прокси Vite; в Docker — через nginx.
 
 ## Тестирование
 

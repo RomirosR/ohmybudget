@@ -41,3 +41,17 @@
 восстанавливает соединения после рестарта контейнера postgres.
 
 **Как проверить:** `alembic upgrade head` на SQLite — без ошибок.
+
+## Шаг 3 — PostgreSQL в Docker Compose (коммит: pending)
+
+**Дата:** 2026-06-08
+
+**Что сделано:**
+- сервис `postgres` (postgres:16-alpine) с healthcheck;
+- `backend` зависит от healthy postgres, `DATABASE_URL` → PostgreSQL;
+- volume `postgres-data` вместо SQLite volume `backend-data`.
+
+**Почему так:** в Docker — production-like стек с PostgreSQL; локально без Docker
+остаётся SQLite по умолчанию.
+
+**Как проверить:** `docker compose up --build` — backend стартует после postgres healthy.
