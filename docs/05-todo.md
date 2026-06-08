@@ -54,10 +54,11 @@
 - [x] `README.md` (оба способа запуска, миграции, seed).
 - [ ] Финальный e2e-прогон по сценарию из `docs/04-infra-run.md`.
 
-## 9. PostgreSQL + авторизация (ветка `feature/postgres-auth`)
-- [x] Dual-DB: PostgreSQL в Docker, SQLite локально/pytest — журнал `docs/06-postgres-migration.md`.
-- [x] JWT auth: register/login/me, `get_current_user` — журнал `docs/07-auth.md`.
-- [x] `user_id` на доменных таблицах, изоляция в repos/routes/services.
-- [x] Frontend: LoginPage, AuthContext, Bearer в `client.ts`.
-- [x] pytest: auth + tenancy; `npm run build`.
-- [ ] PR в `main`, e2e с двумя пользователями.
+## 9. PostgreSQL + авторизация — влито в `main` (PR #1)
+- [x] Dual-DB, JWT, `user_id`, frontend auth — журналы `docs/06`, `docs/07`.
+
+## 10. Гостевой режим — влито в `main` (PR #2)
+- [x] GET без токена, отложенное сохранение после регистрации — `docs/08-guest-mode.md`.
+
+## Открыто
+- [ ] E2e-прогон (`docs/04-infra-run.md`), Docker+PG на dev-машине.
