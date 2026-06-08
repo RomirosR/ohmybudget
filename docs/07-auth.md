@@ -92,3 +92,14 @@
 - `bcrypt` напрямую вместо `passlib` (совместимость с Python 3.14).
 
 **Как проверить:** `cd backend && pytest` — все тесты зелёные.
+
+## Шаг 8 — frontend auth (коммит: pending)
+
+**Дата:** 2026-06-08
+
+**Что сделано:**
+- `client.ts`: Bearer token, `setToken`, 401 → logout;
+- `auth.ts`, `AuthContext`, `LoginPage`, gate в `App.tsx`;
+- кнопка «Выйти», стили login-формы.
+
+**Как проверить:** `npm run dev` → регистрация → 7 табов → выход → снова login.

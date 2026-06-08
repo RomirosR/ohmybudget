@@ -5,9 +5,17 @@
 
 ## Слой доступа к API (`src/api/`)
 
-- `client.ts` — fetch-обёртка + baseURL (в dev Vite проксирует `/api` → :8000).
+- `client.ts` — fetch-обёртка + baseURL (в dev Vite проксирует `/api` → :8000),
+  JWT Bearer из `localStorage`, обработка 401.
+- `auth.ts` — register, login, me.
 - по файлу на ресурс: `lookups.ts`, `plans.ts`, `operations.ts`, `investments.ts`,
   `assets.ts`, `summary.ts`, `history.ts`.
+
+## Авторизация (`src/context/AuthContext.tsx`)
+
+- `AuthProvider` — user state, login/register/logout, `queryClient.clear()` на выход.
+- `LoginPage` — форма входа/регистрации; `App.tsx` показывает её без токена.
+- Подробности — [`docs/07-auth.md`](07-auth.md).
 
 ## Типы (`src/types/`)
 
