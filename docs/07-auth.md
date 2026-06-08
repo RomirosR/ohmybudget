@@ -27,3 +27,15 @@
 **Почему так:** dev-default secret для локальной разработки; prod — через `JWT_SECRET` env.
 
 **Как проверить:** unit-проверка encode/decode в pytest (шаг 7).
+
+## Шаг 3 — register и login (коммит: pending)
+
+**Дата:** 2026-06-08
+
+**Что сделано:**
+- `POST /api/auth/register`, `POST /api/auth/login` → JWT;
+- `user_repo`, схемы `schemas/auth.py`, роутер подключён в `main.py`.
+
+**Почему так:** регистрация сразу возвращает токен — фронту не нужен второй запрос.
+
+**Как проверить:** Swagger `/docs` — register → login с тем же email.
