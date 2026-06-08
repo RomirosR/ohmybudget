@@ -51,3 +51,18 @@
 **Почему так:** единая зависимость для всех защищённых роутов (шаг 6).
 
 **Как проверить:** register → Authorize Bearer → GET `/api/auth/me`.
+
+## Шаг 5 — user_id на доменных таблицах (коммит: pending)
+
+**Дата:** 2026-06-08
+
+**Что сделано:**
+- `user_id` FK → `users.id` в `monthly_plans`, `operations`, `investments`, `assets`,
+  `month_settings`;
+- уникальность `month_settings` — `(user_id, year, month)`;
+- миграция `b2c3d4e5f6a7` очищает старые строки без владельца.
+
+**Почему так:** данные до auth не привязаны к пользователю — нужен fresh DB:
+`rm backend/ohmybudget.db && alembic upgrade head`.
+
+**Как проверить:** `alembic upgrade head` — колонки `user_id` NOT NULL.

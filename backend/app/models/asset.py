@@ -12,6 +12,7 @@ class Asset(Base):
     __tablename__ = "assets"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
     date: Mapped[date] = mapped_column(Date, nullable=False)
     asset_type_id: Mapped[int] = mapped_column(
         ForeignKey("asset_types.id"), nullable=False

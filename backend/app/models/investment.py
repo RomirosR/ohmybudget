@@ -13,6 +13,7 @@ class Investment(Base):
     __tablename__ = "investments"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
     security_type_id: Mapped[int] = mapped_column(
         ForeignKey("security_types.id"), nullable=False
