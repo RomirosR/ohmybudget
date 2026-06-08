@@ -75,6 +75,14 @@ export function NumberField({
     hideTimer.current = setTimeout(() => setShowInvalidHint(false), HINT_HIDE_MS);
   };
 
+  const clearInvalidHint = () => {
+    setShowInvalidHint(false);
+    if (hideTimer.current) {
+      clearTimeout(hideTimer.current);
+      hideTimer.current = null;
+    }
+  };
+
   useEffect(() => {
     return () => {
       if (hideTimer.current) clearTimeout(hideTimer.current);
@@ -105,15 +113,16 @@ export function NumberField({
             allowNegative,
             integerOnly,
           );
-          if (incoming !== raw) flashInvalidHint();
+          if (incoming !== raw) {
+            flashInvalidHint();
+          } else if (showInvalidHint) {
+            clearInvalidHint();
+          }
           setText(raw);
           const parsed = Number(raw.replace(",", "."));
           onChange(raw.trim() === "" || Number.isNaN(parsed) ? 0 : parsed);
         }}
-        onBlur={() => {
-          setShowInvalidHint(false);
-          if (hideTimer.current) clearTimeout(hideTimer.current);
-        }}
+        onBlur={() => clearInvalidHint()}
         {...rest}
       />
       {showInvalidHint && (
