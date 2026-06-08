@@ -14,3 +14,17 @@
 задача + запись в журнале.
 
 **Как проверить:** `git branch --show-current` → `feature/postgres-auth`.
+
+## Шаг 1 — драйвер psycopg и пример env (коммит: pending)
+
+**Дата:** 2026-06-08
+
+**Что сделано:**
+- добавлен `psycopg[binary]>=3.1` в `backend/pyproject.toml`;
+- создан `backend/.env.example` с `DATABASE_URL`, `JWT_SECRET`, `JWT_EXPIRE_MINUTES`;
+- добавлен корневой `.gitignore` (`.env`, `*.db`, `.venv`, `node_modules`).
+
+**Почему так:** PostgreSQL в SQLAlchemy 2 требует драйвер `psycopg`; dual-DB — URL через env,
+без смены кода при переключении SQLite ↔ PostgreSQL.
+
+**Как проверить:** `cd backend && pip install -e .` — пакет `psycopg` в списке зависимостей.
