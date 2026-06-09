@@ -4,7 +4,7 @@
 
 Handoff и чеклист: [`docs/12-hosting-handoff.md`](12-hosting-handoff.md).
 
-## Шаг 1 — ВМ + статический IP (коммит: pending)
+## Шаг 1 — ВМ + статический IP (коммит: bd02a65)
 
 **Дата:** 2026-06-09
 
@@ -20,7 +20,7 @@ Handoff и чеклист: [`docs/12-hosting-handoff.md`](12-hosting-handoff.md)
 
 **Почему так:** один сервер с Docker — минимальная стоимость и простой деплой для MVP; TLS на хостовом nginx, приложение слушает только localhost:8080.
 
-## Шаг 1b — Пересоздание ВМ (SSH-ключ) (коммит: pending)
+## Шаг 1b — Пересоздание ВМ (SSH-ключ) (коммит: bd02a65)
 
 **Дата:** 2026-06-09
 
@@ -48,7 +48,7 @@ ssh -i ~/.ssh/githubpersonal -o IdentitiesOnly=yes ubuntu@62.84.127.30
 - `deploy/setup-server.sh` — Docker, nginx, certbot на Ubuntu
 - `deploy/install-on-server.sh` — деплой с Mac (`DEPLOY_IDENTITY_FILE` → `~/.ssh/githubpersonal`)
 
-## Шаг 3 — Деплой на прод (коммит: pending)
+## Шаг 3 — Деплой на прод (коммит: bd02a65)
 
 **Дата:** 2026-06-09
 
