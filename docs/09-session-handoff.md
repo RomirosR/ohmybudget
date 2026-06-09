@@ -78,5 +78,5 @@ frontend/src/hooks/useGuardedMutation.ts
 
 Хостинг YC: **в проде** — https://ohmybudget.by.
 Безопасность: UFW/fail2ban применены (`docs/14-hosting-security.md`).
-CI/CD: см. `docs/15-cicd.md` (нужны GitHub Secrets).
+CI/CD: **работает** — merge в `main` → Actions → деплой (`docs/15-cicd.md`).
 Открыто: YC SG в консоли, S3-бэкапы, почта.

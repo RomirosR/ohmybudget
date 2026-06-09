@@ -48,7 +48,15 @@ ssh-keygen -t ed25519 -f deploy/.github-actions-deploy -N "" -C "github-actions-
 curl -s https://ohmybudget.by/api/health
 ```
 
+## Шаг 2 — первый автодеплой (коммит: ebf75ca)
+
+**Дата:** 2026-06-09
+
+**Что сделано:** PR #8 влит; GitHub Actions CI/CD — test + deploy success; сервер на `ebf75ca`.
+
+**Как проверить:** https://github.com/RomirosR/ohmybudget/actions — workflow **CI/CD** green; `curl https://ohmybudget.by/api/health`
+
 ## Открыто
 
-- [ ] Добавить `DEPLOY_HOST` и `DEPLOY_SSH_KEY` в GitHub Secrets (вручную)
+- [x] GitHub Secrets `DEPLOY_HOST`, `DEPLOY_SSH_KEY`
 - [ ] (опционально) required reviewers для environment `production`
