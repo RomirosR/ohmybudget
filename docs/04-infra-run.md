@@ -35,6 +35,20 @@ docker compose up --build
 
 Подробности dual-DB — в [`docs/06-postgres-migration.md`](06-postgres-migration.md).
 
+## Production (Yandex Cloud)
+
+Журнал: [`docs/13-hosting-yc.md`](13-hosting-yc.md). Handoff: [`docs/12-hosting-handoff.md`](12-hosting-handoff.md).
+
+```bash
+# на сервере, в каталоге клона репо
+cp .env.prod.example .env.prod   # POSTGRES_PASSWORD, JWT_SECRET
+docker compose --env-file .env.prod \
+  -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+```
+
+- Frontend доступен только на `127.0.0.1:8080`; TLS — хостовый nginx (`deploy/nginx/`).
+- Первичная настройка Ubuntu: `sudo bash deploy/setup-server.sh`.
+
 ## Переменные окружения
 
 - `DATABASE_URL` (бэк) — SQLite по умолчанию (`backend/ohmybudget.db`); в Docker Compose —

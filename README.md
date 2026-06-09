@@ -24,6 +24,8 @@ docs/       выжимка по проекту и слоям
 ```bash
 docker compose up --build
 ```
+
+Production (Yandex Cloud, TLS на nginx хоста): см. [`docs/13-hosting-yc.md`](docs/13-hosting-yc.md).
 - Frontend: http://localhost:5173
 - Backend (Swagger): http://localhost:8000/docs
 - PostgreSQL 16 (данные в volume `postgres-data`)

@@ -4,7 +4,7 @@
 > `@README.md`, `@docs/00-overview.md`). Правила агентов подхватываются автоматически из
 > `.cursor/rules/git-and-docs-workflow.mdc`.
 
-**Обновлено:** 2026-06-08
+**Обновлено:** 2026-06-09 (prod deploy)
 
 ## Текущее состояние репозитория
 
@@ -71,6 +71,10 @@ frontend/src/hooks/useGuardedMutation.ts
 - [ ] Docker Compose + PostgreSQL не проверялся на машине разработчика (Docker не установлен)
 - [ ] `docs/05-todo.md` §9 — отметить PR как влитый (можно обновить при следующей задаче)
 
+- `docs/11-email-verification.md` — **не актуален** (фича откатана; черновик не в main).
+- `docs/12-hosting-handoff.md` — **handoff хостинга YC + домен ohmybudget.by**.
+
 ## Следующая задача
 
-_Заполни в новом чате._
+Хостинг YC: **в проде** — https://ohmybudget.by (журнал `docs/13-hosting-yc.md`).
+Открыто: security group, S3-бэкапы, почта.
