@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+# UFW + fail2ban + nginx security headers на прод-ВМ.
+# Запуск на сервере: sudo ADMIN_SSH_CIDR=1.2.3.4/32 bash harden-server.sh
+# Или с Mac: bash deploy/apply-security.sh
+set -euo pipefail
+
+if [[ "${EUID:-$(id -u)}" -ne 0 ]]; then
+  echo "Запустите от root: sudo ADMIN_SSH_CIDR=x.x.x.x/32 bash harden-server.sh"
+  exit 1
+fi
+
+ADMIN_SSH_CIDR="${ADMIN_SSH_CIDR:?Укажите ADMIN_SSH_CIDR (например 1.2.3.4/32)}"
+
+if [[ "$ADMIN_SSH_CIDR" == *"YOUR"* ]] || [[ "$ADMIN_SSH_CIDR" == "0.0.0.0/0" ]]; then
+  echo "ADMIN_SSH_CIDR выглядит небезопасно: $ADMIN_SSH_CIDR"
+  exit 1
+fi
+
+export DEBIAN_FRONTEND=noninteractive
+apt-get update
+apt-get install -y ufw fail2ban
+
+echo "==> UFW: 80/443 для всех, SSH только с $ADMIN_SSH_CIDR"
+ufw --force reset
+ufw default deny incoming
+ufw default allow outgoing
+ufw allow 80/tcp comment 'http public'
+ufw allow 443/tcp comment 'https public'
+ufw allow from "$ADMIN_SSH_CIDR" to any port 22 proto tcp comment 'ssh admin'
+ufw --force enable
+ufw status verbose
+
+echo "==> fail2ban (sshd)"
+install -d -m 0755 /etc/fail2ban/jail.d
+cat > /etc/fail2ban/jail.d/sshd.local <<'EOF'
+[sshd]
+enabled = true
+maxretry = 5
+bantime = 1h
+findtime = 10m
+EOF
+systemctl enable --now fail2ban
+
+SNIPPET_SRC="${HARDEN_SNIPPET_SRC:-/opt/ohmybudget/deploy/nginx/snippets/security-headers.conf}"
+SNIPPET_DST=/etc/nginx/snippets/security-headers.conf
+if [[ -f "$SNIPPET_SRC" ]]; then
+  echo "==> nginx security headers"
+  install -d -m 0755 /etc/nginx/snippets
+  cp "$SNIPPET_SRC" "$SNIPPET_DST"
+  SITE=/etc/nginx/sites-available/ohmybudget.conf
+  if [[ -f "$SITE" ]] && ! grep -q 'security-headers.conf' "$SITE"; then
+    sed -i '/listen 443 ssl/a \    include /etc/nginx/snippets/security-headers.conf;' "$SITE"
+    nginx -t
+    systemctl reload nginx
+  fi
+fi
+
+echo "Готово. Сайт :80/:443 открыт для всех; SSH — только $ADMIN_SSH_CIDR"
