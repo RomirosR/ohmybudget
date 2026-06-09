@@ -42,7 +42,9 @@ main ──► feature/<имя> ──► локальные тесты ──�
 | **Run workflow** вручную | ✅ | ✅ |
 
 **Код** (триггерит test/deploy): `backend/**`, `frontend/**`, `docker-compose*.yml`,
-`deploy/deploy.sh`, `deploy/nginx/**`, `.github/workflows/**`.
+`deploy/deploy.sh`, `deploy/nginx/**`.
+
+Изменения только в `.github/workflows/**` — test/deploy по-прежнему по diff PR (workflow меняется редко); на `main` без app-кода деплой не нужен.
 
 **Не триггерит deploy:** `docs/**`, `README.md`, `.cursor/rules/**`, прочие `deploy/*` (hardening, backup и т.д. — применяются вручную на сервере).
 
