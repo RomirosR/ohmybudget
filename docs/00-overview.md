@@ -76,3 +76,5 @@ backend / данные.
 - `docs/08-guest-mode.md` — журнал гостевого режима (просмотр без входа, сохранение после регистрации).
 - `docs/09-session-handoff.md` — **handoff для нового чата** (текущее состояние main, что сделано, как запускать).
 - `docs/10-input-validation.md` — журнал валидации ввода и защиты от инъекций.
+- `docs/12-hosting-handoff.md` — handoff хостинга (YC, домен ohmybudget.by).
+- `docs/13-hosting-yc.md` — журнал хостинга YC (ВМ, prod compose, деплой).

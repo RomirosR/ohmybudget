@@ -1,0 +1,22 @@
+# Production override: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+# Секреты — в .env.prod (см. .env.prod.example). Nginx + TLS — на хосте (deploy/nginx/).
+
+services:
+  postgres:
+    ports: []
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    restart: unless-stopped
+
+  backend:
+    ports: []
+    environment:
+      DATABASE_URL: postgresql+psycopg://ohmybudget:${POSTGRES_PASSWORD}@postgres:5432/ohmybudget
+      JWT_SECRET: ${JWT_SECRET}
+      CORS_ORIGINS: '["https://ohmybudget.by","https://www.ohmybudget.by"]'
+    restart: unless-stopped
+
+  frontend:
+    ports:
+      - "127.0.0.1:8080:80"
+    restart: unless-stopped

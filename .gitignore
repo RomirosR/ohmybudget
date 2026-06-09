@@ -1,4 +1,10 @@
 .env
+.env.prod
+backend/.env
+.deploy_key
+*.pem
+*.key
+credentials.json
 *.db
 .venv/
 node_modules/
