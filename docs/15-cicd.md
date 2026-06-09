@@ -58,7 +58,7 @@ curl -s https://ohmybudget.by/api/health
 
 **Как проверить:** https://github.com/RomirosR/ohmybudget/actions — workflow **CI/CD** green; `curl https://ohmybudget.by/api/health`
 
-## Шаг 3 — path filter (деплой только при изменении кода) (коммит: pending)
+## Шаг 3 — path filter (деплой только при изменении кода) (коммит: e0c5f5d)
 
 **Дата:** 2026-06-09
 
