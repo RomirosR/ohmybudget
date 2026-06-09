@@ -16,7 +16,7 @@ Handoff и чеклист: [`docs/12-hosting-handoff.md`](12-hosting-handoff.md)
   - Первый IP: `93.77.176.164` (сменился после stop/start; см. шаг 1b)
 - ID первой ВМ: `fhmr6igklt4doq0lkfa0` (удалена)
 - Сеть: `default`, subnet `default-ru-central1-a`
-- Security group `default-sg`: сейчас **весь ingress открыт** (0.0.0.0/0) — позже сузить SSH до IP пользователя
+- Security group `default-sg`: весь ingress открыт; SSH защищён ключами + fail2ban (без whitelist IP)
 
 **Почему так:** один сервер с Docker — минимальная стоимость и простой деплой для MVP; TLS на хостовом nginx, приложение слушает только localhost:8080.
 

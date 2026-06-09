@@ -10,22 +10,29 @@
 
 **Что сделано:**
 
-- `deploy/harden-server.sh` — UFW: **80/443 для всех**, SSH (22) только с `ADMIN_SSH_CIDR`
-- `deploy/apply-security.sh` — применение с Mac; секреты в `deploy/security.env` (gitignore)
+- `deploy/harden-server.sh` — UFW: **80/443/22 для всех**; SSH по ключам + fail2ban (без whitelist IP)
+- `deploy/apply-security.sh` — применение с Mac
 - `deploy/nginx/snippets/security-headers.conf` — HSTS, X-Frame-Options, nosniff
 - fail2ban для sshd
 - `deploy/yc/security-group.md` — инструкция SG в YC (MCP не поддерживает)
 
-**Почему так:** сайт остаётся публичным; сужаем только админский SSH. Два слоя: UFW на ВМ + (опционально) SG в YC.
+**Почему так:** сайт публичный; несколько админов/IP — SSH не режем по CIDR, только ключи в metadata ВМ + fail2ban.
 
 **Как проверить:**
 
 ```bash
-cp deploy/security.env.example deploy/security.env   # ваш IP/32
 bash deploy/apply-security.sh
 curl -sI https://ohmybudget.by/ | grep -i strict-transport
-ssh -i ~/.ssh/githubpersonal ubuntu@62.84.127.30    # с вашего IP — OK
+ssh -i ~/.ssh/githubpersonal ubuntu@62.84.127.30
 ```
+
+Доп. админ: добавить его публичный ключ в metadata ВМ (`ssh-keys`, строка `ubuntu:ssh-ed25519 …` на новой строке).
+
+## Шаг 1c — SSH без whitelist IP (коммит: 6231b3d)
+
+**Дата:** 2026-06-09
+
+**Что сделано:** убрана привязка SSH к `ADMIN_SSH_CIDR` — несколько админов и IP; защита: ключи в metadata ВМ + fail2ban.
 
 ## Шаг 2 — pg_dump бэкапы (коммит: 8564aed)
 

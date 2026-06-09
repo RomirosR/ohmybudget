@@ -1,18 +1,11 @@
 #!/usr/bin/env bash
 # UFW + fail2ban + nginx security headers на прод-ВМ.
-# Запуск на сервере: sudo ADMIN_SSH_CIDR=1.2.3.4/32 bash harden-server.sh
+# Запуск на сервере: sudo bash harden-server.sh
 # Или с Mac: bash deploy/apply-security.sh
 set -euo pipefail
 
 if [[ "${EUID:-$(id -u)}" -ne 0 ]]; then
-  echo "Запустите от root: sudo ADMIN_SSH_CIDR=x.x.x.x/32 bash harden-server.sh"
-  exit 1
-fi
-
-ADMIN_SSH_CIDR="${ADMIN_SSH_CIDR:?Укажите ADMIN_SSH_CIDR (например 1.2.3.4/32)}"
-
-if [[ "$ADMIN_SSH_CIDR" == *"YOUR"* ]] || [[ "$ADMIN_SSH_CIDR" == "0.0.0.0/0" ]]; then
-  echo "ADMIN_SSH_CIDR выглядит небезопасно: $ADMIN_SSH_CIDR"
+  echo "Запустите от root: sudo bash harden-server.sh"
   exit 1
 fi
 
@@ -20,13 +13,13 @@ export DEBIAN_FRONTEND=noninteractive
 apt-get update
 apt-get install -y ufw fail2ban
 
-echo "==> UFW: 80/443 для всех, SSH только с $ADMIN_SSH_CIDR"
+echo "==> UFW: 80/443/22 для всех (SSH без привязки к IP; защита — ключи + fail2ban)"
 ufw --force reset
 ufw default deny incoming
 ufw default allow outgoing
 ufw allow 80/tcp comment 'http public'
 ufw allow 443/tcp comment 'https public'
-ufw allow from "$ADMIN_SSH_CIDR" to any port 22 proto tcp comment 'ssh admin'
+ufw allow 22/tcp comment 'ssh key-only'
 ufw --force enable
 ufw status verbose
 
@@ -55,4 +48,4 @@ if [[ -f "$SNIPPET_SRC" ]]; then
   fi
 fi
 
-echo "Готово. Сайт :80/:443 открыт для всех; SSH — только $ADMIN_SSH_CIDR"
+echo "Готово. Сайт и SSH (:22) открыты; доступ по SSH-ключам, fail2ban против перебора."
