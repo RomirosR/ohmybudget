@@ -4,7 +4,7 @@
 
 См. также: [`docs/13-hosting-yc.md`](13-hosting-yc.md), [`docs/12-hosting-handoff.md`](12-hosting-handoff.md).
 
-## Шаг 1 — UFW, fail2ban, nginx headers (коммит: pending)
+## Шаг 1 — UFW, fail2ban, nginx headers (коммит: 8564aed)
 
 **Дата:** 2026-06-09
 
@@ -27,7 +27,7 @@ curl -sI https://ohmybudget.by/ | grep -i strict-transport
 ssh -i ~/.ssh/githubpersonal ubuntu@62.84.127.30    # с вашего IP — OK
 ```
 
-## Шаг 2 — pg_dump бэкапы (коммит: pending)
+## Шаг 2 — pg_dump бэкапы (коммит: 8564aed)
 
 **Дата:** 2026-06-09
 
