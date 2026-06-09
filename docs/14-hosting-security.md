@@ -28,7 +28,7 @@ ssh -i ~/.ssh/githubpersonal ubuntu@62.84.127.30
 
 Доп. админ: добавить его публичный ключ в metadata ВМ (`ssh-keys`, строка `ubuntu:ssh-ed25519 …` на новой строке).
 
-## Шаг 1c — SSH без whitelist IP (коммит: pending)
+## Шаг 1c — SSH без whitelist IP (коммит: 6231b3d)
 
 **Дата:** 2026-06-09
 
