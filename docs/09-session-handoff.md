@@ -76,5 +76,6 @@ frontend/src/hooks/useGuardedMutation.ts
 
 ## Следующая задача
 
-Хостинг YC: **в проде** — https://ohmybudget.by (журнал `docs/13-hosting-yc.md`).
-Открыто: security group, S3-бэкапы, почта.
+Хостинг YC: **в проде** — https://ohmybudget.by.
+Безопасность: UFW/fail2ban применены (`docs/14-hosting-security.md`).
+Открыто: YC SG в консоли, S3-бэкапы, почта.

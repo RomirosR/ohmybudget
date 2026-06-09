@@ -153,6 +153,6 @@ Node.js 18+, при первом вызове — OAuth Yandex Cloud. Роль �
 
 ## Следующий шаг
 
-1. Ужесточить security group (SSH с вашего IP).
-2. (опционально) S3-бэкапы pg_dump.
+1. YC security group в консоли — `deploy/yc/security-group.md` (UFW на ВМ уже включён).
+2. Cron + S3 для `deploy/backup-postgres.sh` — журнал `docs/14-hosting-security.md`.
 3. (позже) почта noreply@ohmybudget.by.
