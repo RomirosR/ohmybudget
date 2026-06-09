@@ -36,9 +36,11 @@
 - `POST /api/auth/register`, `POST /api/auth/login` → JWT;
 - `user_repo`, схемы `schemas/auth.py`, роутер подключён в `main.py`.
 
-**Почему так:** регистрация сразу возвращает токен — фронту не нужен второй запрос.
+**Почему так:** изначально регистрация сразу возвращала токен (упрощённый UX).
 
 **Как проверить:** Swagger `/docs` — register → login с тем же email.
+
+> **Обновление (2026-06-09):** регистрация требует подтверждения email — см. `docs/16-email-verification.md`.
 
 ## Шаг 4 — get_current_user (коммит: pending)
 

@@ -65,8 +65,8 @@
 
 - [ ] YC security group (опционально)
 - [ ] S3 offsite backups
-- [ ] Почта noreply@ohmybudget.by
+- [ ] Postbox: адрес `noreply@ohmybudget.by`, DKIM CNAME у регистратора, SPF, API-ключ в `.env.prod` — см. `docs/16-email-verification.md` §3
 
-## Email verification — откатана
+## Email verification
 
-Resend без верифицированного домена бесполезен. Ветка удалена. См. историю в старом §чата в этом файле / `docs/09`.
+В ветке `feature/email-verification`: регистрация → письмо → подтверждение по ссылке → login. Отправка через Yandex Cloud Postbox (SMTP). Журнал: `docs/16-email-verification.md`.

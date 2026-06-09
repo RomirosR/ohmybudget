@@ -14,6 +14,13 @@ services:
       DATABASE_URL: postgresql+psycopg://ohmybudget:${POSTGRES_PASSWORD}@postgres:5432/ohmybudget
       JWT_SECRET: ${JWT_SECRET}
       CORS_ORIGINS: '["https://ohmybudget.by","https://www.ohmybudget.by"]'
+      APP_PUBLIC_URL: ${APP_PUBLIC_URL:-https://ohmybudget.by}
+      EMAIL_TRANSPORT: ${EMAIL_TRANSPORT:-smtp}
+      EMAIL_FROM: ${EMAIL_FROM:-noreply@ohmybudget.by}
+      SMTP_HOST: ${SMTP_HOST:-postbox.cloud.yandex.net}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
     restart: unless-stopped
 
   frontend:
