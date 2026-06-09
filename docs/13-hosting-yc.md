@@ -68,6 +68,7 @@ curl -s https://ohmybudget.by/api/health   # {"status":"ok"}
 ## Открыто
 
 - [x] DNS и деплой на ВМ
-- [ ] Ужесточить security group (SSH только с IP пользователя)
+- [x] UFW + fail2ban + nginx headers — см. [`docs/14-hosting-security.md`](14-hosting-security.md)
+- [ ] YC security group (консоль / `yc`, см. `deploy/yc/security-group.md`)
 - [ ] (опционально) S3-бэкапы pg_dump
 - [ ] (позже) почта noreply@ohmybudget.by
