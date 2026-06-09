@@ -1,82 +1,91 @@
 # Handoff — контекст для нового чата
 
-> **Как использовать:** в новом чате Cursor прикрепи `@docs/09-session-handoff.md` (+ при необходимости
-> `@README.md`, `@docs/00-overview.md`). Правила агентов подхватываются автоматически из
-> `.cursor/rules/git-and-docs-workflow.mdc`.
+> **Как использовать:** в новом чате прикрепи `@docs/09-session-handoff.md` (+ `@README.md`, при хостинге —
+> `@docs/12-hosting-handoff.md`). Правила агентов: `.cursor/rules/git-and-docs-workflow.mdc` (auto).
 
-**Обновлено:** 2026-06-09 (prod deploy)
+**Обновлено:** 2026-06-09 (конец сессии: прод + CI/CD + security)
 
-## Текущее состояние репозитория
+## Текущее состояние
 
-- **Ветка:** `main` (= `origin/main`)
-- **Последний merge:** `060cae6` — input validation (PR #4); правила агентов (PR #3)
 - **Репо:** https://github.com/RomirosR/ohmybudget
+- **Ветка:** `main` (= `origin/main`), последний merge: `f888fb8` (smart CI/CD + workflow rules, PR #10)
+- **Прод:** https://ohmybudget.by — работает, HTTPS, CI/CD деплоит при изменении кода
 
-## Что уже в main
+## Что в main (фичи)
 
-| Фича | Суть | Журнал |
-|------|------|--------|
-| PostgreSQL dual-DB | SQLite локально/pytest, PG в Docker | `docs/06-postgres-migration.md` |
-| JWT multi-user | register/login/me, `user_id` на сущностях | `docs/07-auth.md` |
-| Guest mode | все вкладки без входа; сохранение после регистрации | `docs/08-guest-mode.md` |
-| Input validation | Pydantic + формы, подсказки у числовых полей | `docs/10-input-validation.md` |
-| Agent workflow | ветка/коммиты/docs/PR | `.cursor/rules/git-and-docs-workflow.mdc` |
+| Фича | Журнал / где |
+|------|----------------|
+| PostgreSQL dual-DB | `docs/06-postgres-migration.md` |
+| JWT + guest mode | `docs/07-auth.md`, `docs/08-guest-mode.md` |
+| Input validation | `docs/10-input-validation.md` |
+| **Хостинг YC** | `docs/13-hosting-yc.md`, handoff `docs/12-hosting-handoff.md` |
+| **Security прод** | `docs/14-hosting-security.md` |
+| **CI/CD** | `docs/15-cicd.md`, `.github/workflows/ci-cd.yml` |
+| **Workflow агентов** | `.cursor/rules/git-and-docs-workflow.mdc` |
 
-## Архитектура (кратко)
+## Прод (кратко)
 
-- **Backend:** FastAPI, `api/deps/auth.py` — `get_current_user` (запись), `get_optional_user` (гостевой GET)
-- **Frontend:** `AuthContext` + `runWithAuth` + `AuthModal`; guarded mutations на CRUD-экранах
-- **БД локально:** `backend/ohmybudget.db` (SQLite)
-- **Env:** `backend/.env.example` (`DATABASE_URL`, `JWT_SECRET`)
+| | |
+|---|---|
+| Домен | `ohmybudget.by` (+ `www`), DNS у регистратора `.by` |
+| ВМ | `ohmybudget-prod` (`fhmfi3a264aq8vpeurgg`), IP **62.84.127.30** |
+| YC | cloud `b1g4b1c73m6s194vncpc`, folder `b1geapdle4ibgnd8pjks` |
+| Код на сервере | `/opt/ohmybudget`, Docker compose prod |
+| Секреты | `.env.prod` на сервере (не в git), GitHub Secrets `DEPLOY_HOST`, `DEPLOY_SSH_KEY` |
 
-## Запуск (локально, без Docker)
+**SSH (пользователь):** `ssh -i ~/.ssh/githubpersonal ubuntu@62.84.127.30`  
+**SSH (Actions):** ключ `deploy/.github-actions-deploy` (локально, gitignore) → Secret `DEPLOY_SSH_KEY`
+
+## CI/CD
+
+```
+feature/* → локально pytest + npm run build → PR → merge (по согласию автора)
+                                                      ↓
+                                    push main + изменён код → test → deploy
+                                    push main только docs → deploy пропускается
+```
+
+Ручной деплой: GitHub → Actions → **CI/CD** → Run workflow.
+
+## Локальная разработка
 
 ```bash
 cd backend && source .venv/bin/activate && alembic upgrade head && uvicorn app.main:app --reload
 cd frontend && npm run dev
-```
-
-- Frontend: http://localhost:5173
-- API/Swagger: http://127.0.0.1:8000/docs
-
-После обновления с версии без auth: `rm backend/ohmybudget.db && alembic upgrade head`
-
-## Тесты
-
-```bash
-cd backend && pytest          # 39 тестов
+cd backend && pytest
 cd frontend && npm run build
 ```
 
-## Workflow для новых фич
+## Workflow агентов (суть)
 
-1. `git checkout main && git pull`
-2. `git checkout -b feature/<имя>`
-3. Атомарные коммиты + документация (журнал в `docs/` или обновление слойных docs); коммитить по ходу работы
-4. PR в `main`, merge по запросу пользователя
+1. `feature/<имя>` от `main`
+2. Атомарные коммиты + docs; **никогда** секреты в git
+3. PR в `main`; **merge только по явному запросу** пользователя
+4. Коммиты — по ходу или по запросу (см. правила в `.cursor/rules`)
+
+## MCP (Yandex Cloud)
+
+Подключены: `yandex-cloud-toolkit`, `containers`, `docs`. **Нет в MCP:** security groups create, Cloud DNS, Postbox.
+
+## Не сделано / открыто
+
+- [ ] YC security group в консоли (опционально; UFW на ВМ уже есть) — `deploy/yc/security-group.md`
+- [ ] S3-бэкапы pg_dump (локальный cron есть: `/etc/cron.d/ohmybudget-backup`)
+- [ ] Почта `noreply@ohmybudget.by` (Postbox/Resend + SPF/DKIM) — email verification откатана
+- [ ] E2E из `docs/04-infra-run.md`
+- [ ] Email verification — **не в main**, `docs/11` не актуален
 
 ## Ключевые файлы
 
 ```
-backend/app/api/deps/auth.py      # get_current_user, get_optional_user
-backend/app/core/security.py      # bcrypt + JWT
-frontend/src/context/AuthContext.tsx
-frontend/src/components/AuthModal.tsx
-frontend/src/hooks/useGuardedMutation.ts
+backend/app/api/deps/auth.py
+deploy/deploy.sh              # прод-обновление на сервере
+deploy/install-on-server.sh   # первичная установка
+deploy/apply-security.sh      # UFW + fail2ban
+.github/workflows/ci-cd.yml
+.cursor/rules/git-and-docs-workflow.mdc
 ```
 
-## Не сделано / открыто
+## Следующие задачи (на выбор пользователя)
 
-- [ ] E2E-прогон из `docs/04-infra-run.md`
-- [ ] Docker Compose + PostgreSQL не проверялся на машине разработчика (Docker не установлен)
-- [ ] `docs/05-todo.md` §9 — отметить PR как влитый (можно обновить при следующей задаче)
-
-- `docs/11-email-verification.md` — **не актуален** (фича откатана; черновик не в main).
-- `docs/12-hosting-handoff.md` — **handoff хостинга YC + домен ohmybudget.by**.
-
-## Следующая задача
-
-Хостинг YC: **в проде** — https://ohmybudget.by.
-Безопасность: UFW/fail2ban применены (`docs/14-hosting-security.md`).
-CI/CD: **работает** — merge в `main` → Actions → деплой (`docs/15-cicd.md`).
-Открыто: YC SG в консоли, S3-бэкапы, почта.
+Фичи приложения, S3-бэкапы, почта, E2E, YC SG — уточнить у пользователя.
