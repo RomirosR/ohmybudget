@@ -9,7 +9,7 @@ import {
 } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
-import { authApi, type AuthUser } from "../api/auth";
+import { authApi, type AuthUser, type RegisterResponse } from "../api/auth";
 import { getToken, setOnUnauthorized, setToken } from "../api/client";
 
 export interface AuthModalState {
@@ -23,7 +23,7 @@ interface AuthContextValue {
   isLoading: boolean;
   authModal: AuthModalState;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string) => Promise<RegisterResponse>;
   logout: () => void;
   openAuthModal: (opts?: {
     message?: string;
@@ -77,14 +77,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .finally(() => setIsLoading(false));
   }, [logout]);
 
-  const finishAuth = async (email: string, password: string, mode: "login" | "register") => {
-    if (mode === "login") {
-      const { access_token } = await authApi.login({ email, password });
-      setToken(access_token);
-    } else {
-      const { access_token } = await authApi.register({ email, password });
-      setToken(access_token);
-    }
+  const finishLogin = async (email: string, password: string) => {
+    const { access_token } = await authApi.login({ email, password });
+    setToken(access_token);
     setUser(await authApi.me());
     if (pendingRef.current) {
       await pendingRef.current();
@@ -95,11 +90,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const login = async (email: string, password: string) => {
-    await finishAuth(email, password, "login");
+    await finishLogin(email, password);
   };
 
   const register = async (email: string, password: string) => {
-    await finishAuth(email, password, "register");
+    return authApi.register({ email, password });
   };
 
   const openAuthModal = useCallback(

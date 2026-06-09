@@ -1,3 +1,5 @@
+from datetime import UTC, datetime
+
 from sqlalchemy.orm import Session
 
 from app.models.user import User
@@ -17,3 +19,14 @@ def create(db: Session, email: str, hashed_password: str) -> User:
     db.commit()
     db.refresh(user)
     return user
+
+
+def mark_email_verified(db: Session, user: User) -> User:
+    user.email_verified_at = datetime.now(UTC)
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+def is_email_verified(user: User) -> bool:
+    return user.email_verified_at is not None

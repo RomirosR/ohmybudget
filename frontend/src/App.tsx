@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
+import { authApi } from "./api/auth";
 import { AuthModal } from "./components/AuthModal";
 import { useAuth } from "./context/AuthContext";
 import { PlansPage } from "./pages/PlansPage";
@@ -23,6 +24,41 @@ const TABS = [
 export function App() {
   const { user, isLoading, logout, openAuthModal } = useAuth();
   const [active, setActive] = useState<(typeof TABS)[number]["key"]>("plans");
+  const [verifyState, setVerifyState] = useState<
+    "idle" | "pending" | "ok" | "error"
+  >("idle");
+  const [verifyMessage, setVerifyMessage] = useState("");
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("verify");
+    if (!token) return;
+
+    params.delete("verify");
+    const nextUrl =
+      window.location.pathname +
+      (params.toString() ? `?${params}` : "") +
+      window.location.hash;
+    window.history.replaceState({}, "", nextUrl);
+
+    setVerifyState("pending");
+    authApi
+      .verifyEmail(token)
+      .then((result) => {
+        setVerifyState("ok");
+        setVerifyMessage(result.message);
+        openAuthModal({
+          mode: "login",
+          message: "Email подтверждён — войдите в аккаунт.",
+        });
+      })
+      .catch((err) => {
+        setVerifyState("error");
+        setVerifyMessage(
+          err instanceof Error ? err.message : "Ссылка недействительна",
+        );
+      });
+  }, [openAuthModal]);
 
   if (isLoading) {
     return <div className="app-main muted">Загрузка…</div>;
@@ -78,6 +114,15 @@ export function App() {
         </nav>
       </header>
       <main className="app-main">
+        {verifyState === "pending" && (
+          <p className="guest-banner muted">Подтверждаем email…</p>
+        )}
+        {verifyState === "ok" && (
+          <p className="guest-banner verify-banner">{verifyMessage}</p>
+        )}
+        {verifyState === "error" && (
+          <p className="guest-banner login-error">{verifyMessage}</p>
+        )}
         {!user && (
           <p className="guest-banner muted">
             Вы в гостевом режиме: можно просматривать и заполнять формы. Чтобы

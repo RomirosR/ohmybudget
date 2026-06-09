@@ -1,3 +1,5 @@
+from datetime import UTC, datetime
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
@@ -5,7 +7,7 @@ from sqlalchemy.pool import StaticPool
 from sqlalchemy.orm import sessionmaker
 
 import app.models  # noqa: F401 — регистрирует таблицы в Base.metadata
-from app.core.security import create_access_token, hash_password
+from app.core.security import create_access_token, create_email_verify_token, hash_password
 from app.db.base import Base
 from app.db.seed import seed_lookups
 from app.db.session import get_db
@@ -29,11 +31,14 @@ def db_session():
     TestingSession = sessionmaker(bind=engine, autoflush=False, autocommit=False)
     db = TestingSession()
     seed_lookups(db)
+    now = datetime.now(UTC)
     db.add(
         User(
             id=TEST_USER_ID,
             email=TEST_USER_EMAIL,
             hashed_password=hash_password(TEST_USER_PASSWORD),
+            email_verified_at=now,
+            created_at=now,
         )
     )
     db.commit()
