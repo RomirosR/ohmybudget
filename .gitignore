@@ -2,6 +2,8 @@
 .env.prod
 backend/.env
 .deploy_key
+deploy/.github-actions-deploy
+deploy/.github-actions-deploy.pub
 *.pem
 *.key
 credentials.json
