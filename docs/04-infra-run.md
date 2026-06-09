@@ -48,7 +48,7 @@ docker compose --env-file .env.prod \
 
 - Frontend доступен только на `127.0.0.1:8080`; TLS — хостовый nginx (`deploy/nginx/`).
 - Первичная настройка Ubuntu: `sudo bash deploy/setup-server.sh`.
-- Безопасность (UFW, fail2ban): `deploy/security.env` + `bash deploy/apply-security.sh` — см. [`docs/14-hosting-security.md`](14-hosting-security.md).
+- Безопасность (UFW, fail2ban): `bash deploy/apply-security.sh` — см. [`docs/14-hosting-security.md`](14-hosting-security.md).
 
 ## Переменные окружения
 

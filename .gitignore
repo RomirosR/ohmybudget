@@ -2,7 +2,6 @@
 .env.prod
 backend/.env
 .deploy_key
-deploy/security.env
 *.pem
 *.key
 credentials.json
@@ -15,3 +14,4 @@ __pycache__/
 dist/
 *.egg-info/
 *.tsbuildinfo
+deploy/security.env
