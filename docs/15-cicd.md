@@ -14,7 +14,7 @@ feature/* → локальные тесты → PR → merge в main
 
 Локальное тестирование — основное; CI на `main` — страховка перед деплоем.
 
-**Умный деплой:** push в `main` с изменениями только в `docs/`, `README`, `.cursor/rules` — **не** пересобирает Docker на проде. Деплой только при изменении `backend/`, `frontend/`, compose, `deploy/deploy.sh`, nginx-конфига или workflow. Ручной деплой: Actions → **Run workflow**.
+**Умный деплой:** push в `main` с изменениями только в `docs/`, `README`, `.cursor/rules` — **не** пересобирает Docker на проде. Деплой при изменении: `backend/`, `frontend/`, `docker-compose*.yml`, `deploy/deploy.sh`, `deploy/nginx/**`. Ручной деплой: Actions → **Run workflow**.
 
 ## Шаг 1 — workflow + deploy.sh (коммит: 892f055)
 

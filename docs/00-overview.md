@@ -80,3 +80,4 @@ backend / данные.
 - `docs/13-hosting-yc.md` — журнал хостинга YC (ВМ, prod compose, деплой).
 - `docs/14-hosting-security.md` — журнал безопасности прод (UFW, fail2ban, бэкапы).
 - `docs/15-cicd.md` — CI/CD (GitHub Actions → деплой на ВМ).
+- `docs/09-session-handoff.md` — **handoff для нового чата** (стартовая точка агента).
