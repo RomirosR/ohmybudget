@@ -26,6 +26,7 @@ docker compose up --build
 ```
 
 Production (Yandex Cloud, TLS на nginx хоста): см. [`docs/13-hosting-yc.md`](docs/13-hosting-yc.md).
+Деплой при merge в `main`: GitHub Actions — [`docs/15-cicd.md`](docs/15-cicd.md).
 - Frontend: http://localhost:5173
 - Backend (Swagger): http://localhost:8000/docs
 - PostgreSQL 16 (данные в volume `postgres-data`)
