@@ -12,8 +12,29 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    outputs:
+      code: ${{ steps.filter.outputs.code }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            code:
+              - 'backend/**'
+              - 'frontend/**'
+              - 'docker-compose*.yml'
+              - 'deploy/deploy.sh'
+              - 'deploy/nginx/**'
+              - '.github/workflows/**'
+
   test:
     name: Test
+    needs: changes
+    if: needs.changes.outputs.code == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -42,8 +63,12 @@ jobs:
 
   deploy:
     name: Deploy to production
-    needs: test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [changes, test]
+    if: |
+      always() && needs.test.result == 'success' && (
+        github.event_name == 'workflow_dispatch' ||
+        (github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.changes.outputs.code == 'true')
+      )
     runs-on: ubuntu-latest
     environment: production
     steps:

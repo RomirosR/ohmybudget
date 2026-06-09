@@ -14,6 +14,8 @@ feature/* → локальные тесты → PR → merge в main
 
 Локальное тестирование — основное; CI на `main` — страховка перед деплоем.
 
+**Умный деплой:** push в `main` с изменениями только в `docs/`, `README`, `.cursor/rules` — **не** пересобирает Docker на проде. Деплой только при изменении `backend/`, `frontend/`, compose, `deploy/deploy.sh`, nginx-конфига или workflow. Ручной деплой: Actions → **Run workflow**.
+
 ## Шаг 1 — workflow + deploy.sh (коммит: 892f055)
 
 **Дата:** 2026-06-09
@@ -55,6 +57,12 @@ curl -s https://ohmybudget.by/api/health
 **Что сделано:** PR #8 влит; GitHub Actions CI/CD — test + deploy success; сервер на `ebf75ca`.
 
 **Как проверить:** https://github.com/RomirosR/ohmybudget/actions — workflow **CI/CD** green; `curl https://ohmybudget.by/api/health`
+
+## Шаг 3 — path filter (деплой только при изменении кода) (коммит: pending)
+
+**Дата:** 2026-06-09
+
+**Что сделано:** `dorny/paths-filter` в workflow — docs-only merge не триггерит deploy.
 
 ## Открыто
 
