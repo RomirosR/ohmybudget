@@ -4,6 +4,13 @@ set -euo pipefail
 
 APP_DIR="${APP_DIR:-/opt/ohmybudget}"
 BRANCH="${DEPLOY_BRANCH:-main}"
+LOCK_FILE="${APP_DIR}/.deploy.lock"
+
+exec 9>"$LOCK_FILE"
+if ! flock -n 9; then
+  echo "==> another deploy is running, waiting for lock..."
+  flock 9
+fi
 
 cd "$APP_DIR"
 
@@ -22,7 +29,7 @@ sudo docker compose --env-file .env.prod \
   -f docker-compose.prod.yml up -d --build
 
 echo "==> health check..."
-for i in $(seq 1 30); do
+for i in $(seq 1 45); do
   if curl -sf http://127.0.0.1:8080/api/health >/dev/null; then
     echo "OK: /api/health"
     exit 0

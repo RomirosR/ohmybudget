@@ -46,19 +46,65 @@ Postbox **не в MCP** — настраивается в [консоли YC](ht
 
 Дока: [quickstart](https://yandex.cloud/ru/docs/postbox/quickstart), [send-email](https://yandex.cloud/ru/docs/postbox/operations/send-email).
 
-### 3.2 Адрес `noreply@ohmybudget.by`
+### 3.2 DNS через Yandex Cloud DNS (рекомендуется)
 
-1. **Cloud Postbox → Создать адрес** → домен `ohmybudget.by`, DKIM «Простая».
-2. На странице адреса — две **CNAME** для DKIM. Добавить у регистратора `.by` (DNS не в YC).
-3. Дождаться статуса DKIM **Success** (до 24 ч; кнопка «Запустить проверку»).
-4. (Рекомендуется) **SPF** TXT на `@`:
+Сейчас NS у регистратора: `u1.hoster.by`, `u2.hoster.by`. DKIM для Postbox можно
+поднять в **Cloud DNS** и делегировать домен на YC — проверка быстрее, чем ждать hoster.
+
+#### A) Создать зону в YC (ты в консоли)
+
+1. [Cloud DNS](https://console.yandex.cloud/folders/b1geapdle4ibgnd8pjks/dns/zones) → **Создать зону**
+2. Зона: **Публичная**, имя `ohmybudget.by`
+3. После создания запомни **NS-адреса зоны** (обычно `ns1.yandexcloud.net`, `ns2.yandexcloud.net`)
+
+#### B) Перенести текущие записи в зону YC
+
+Добавить в зону (как сейчас на hoster):
+
+| Тип | Имя | Значение |
+|-----|-----|----------|
+| A | `@` | `62.84.127.30` |
+| A | `www` | `62.84.127.30` |
+
+#### C) DKIM из Postbox → в ту же зону YC
+
+1. [Postbox → адрес `ohmybudget.by`](https://console.yandex.cloud/folders/b1geapdle4ibgnd8pjks/postbox) → блок **DKIM**
+2. Две **CNAME** — создать в Cloud DNS (имя и значение скопировать из Postbox)
+3. **SPF** TXT на `@`:
    ```
    v=spf1 include:_spf.yandex.net ~all
    ```
-   Если SPF уже есть — добавить `include:_spf.yandex.net`, не создавать вторую TXT.
-5. (Опционально) **DMARC** — см. [setup-dmarc](https://yandex.cloud/ru/docs/postbox/operations/setup-dmarc).
 
-### 3.3 Секреты на прод-ВМ
+#### D) Делегировать домен на YC (у регистратора / hoster.by)
+
+В панели домена **заменить NS** (удалить старые `u1/u2.hoster.by`):
+
+```
+ns1.yandexcloud.net
+ns2.yandexcloud.net
+```
+
+Сайт не упадёт, если шаг B сделан **до** смены NS.
+
+#### E) Проверка
+
+```bash
+dig @ns1.yandexcloud.net ohmybudget.by A +short    # → 62.84.127.30
+dig @ns1.yandexcloud.net www.ohmybudget.by A +short
+```
+
+Postbox → адрес → DKIM **Success** → «Запустить проверку».
+
+#### Альтернатива без делегирования
+
+Оставить NS на hoster — только 2× CNAME (DKIM) + SPF TXT в панели hoster (без смены NS).
+
+### 3.3 Адрес `noreply@ohmybudget.by` в Postbox
+
+1. **Cloud Postbox → Создать адрес** → домен `ohmybudget.by`, DKIM «Простая» (если ещё нет).
+2. CNAME для DKIM — в Cloud DNS (§3.2C) или у hoster (альтернатива).
+
+### 3.4 Секреты на прод-ВМ
 
 В `/opt/ohmybudget/.env.prod` (не в git):
 
@@ -74,7 +120,7 @@ SMTP_PASSWORD=<api-key-secret>
 
 После merge и деплоя — зарегистрировать тестовый аккаунт на проде и проверить входящее письмо.
 
-### 3.4 Локальная разработка
+### 3.5 Локальная разработка
 
 ```env
 EMAIL_TRANSPORT=console
