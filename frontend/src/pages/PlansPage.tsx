@@ -94,35 +94,37 @@ export function PlansPage() {
           <h3>
             {monthName(g.month)} {g.year}
           </h3>
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Категория</th>
-                <th>Тип</th>
-                <th style={{ textAlign: "right" }}>План на месяц</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {g.rows.map((p) => (
-                <tr key={p.id}>
-                  <td>{p.category}</td>
-                  <td className={p.is_income ? "income" : "expense"}>
-                    {p.is_income ? "Доход" : "Расход"}
-                  </td>
-                  <td style={{ textAlign: "right" }}>{formatMoney(p.amount)}</td>
-                  <td style={{ textAlign: "right" }}>
-                    <button
-                      className="danger"
-                      onClick={() => deleteMut.mutate(p.id)}
-                    >
-                      Удалить
-                    </button>
-                  </td>
+          <div className="table-wrap">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Категория</th>
+                  <th>Тип</th>
+                  <th style={{ textAlign: "right" }}>План на месяц</th>
+                  <th></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {g.rows.map((p) => (
+                  <tr key={p.id}>
+                    <td>{p.category}</td>
+                    <td className={p.is_income ? "income" : "expense"}>
+                      {p.is_income ? "Доход" : "Расход"}
+                    </td>
+                    <td style={{ textAlign: "right" }}>{formatMoney(p.amount)}</td>
+                    <td style={{ textAlign: "right" }}>
+                      <button
+                        className="danger"
+                        onClick={() => deleteMut.mutate(p.id)}
+                      >
+                        Удалить
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       ))}
     </div>

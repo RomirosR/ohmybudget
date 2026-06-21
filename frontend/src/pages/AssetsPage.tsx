@@ -63,30 +63,32 @@ export function AssetsPage() {
         />
       </div>
       <div className="card">
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>Дата</th>
-              <th>Тип актива</th>
-              <th style={{ textAlign: "right" }}>Сумма</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {sorted.map((a) => (
-              <tr key={a.id}>
-                <td>{a.date}</td>
-                <td>{typeName.get(a.asset_type_id) ?? "?"}</td>
-                <td style={{ textAlign: "right" }}>{formatMoney(a.amount)}</td>
-                <td style={{ textAlign: "right" }}>
-                  <button className="danger" onClick={() => deleteMut.mutate(a.id)}>
-                    Удалить
-                  </button>
-                </td>
+        <div className="table-wrap">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Дата</th>
+                <th>Тип актива</th>
+                <th style={{ textAlign: "right" }}>Сумма</th>
+                <th></th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {sorted.map((a) => (
+                <tr key={a.id}>
+                  <td>{a.date}</td>
+                  <td>{typeName.get(a.asset_type_id) ?? "?"}</td>
+                  <td style={{ textAlign: "right" }}>{formatMoney(a.amount)}</td>
+                  <td style={{ textAlign: "right" }}>
+                    <button className="danger" onClick={() => deleteMut.mutate(a.id)}>
+                      Удалить
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         {sorted.length === 0 && <p className="muted">Активов пока нет.</p>}
       </div>
     </div>
