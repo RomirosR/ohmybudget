@@ -138,7 +138,6 @@ export function App() {
               </>
             ) : (
               <>
-                <span className="muted guest-hint">Гостевой режим</span>
                 <button
                   type="button"
                   className="tab"
@@ -148,7 +147,7 @@ export function App() {
                 </button>
                 <button
                   type="button"
-                  className="tab active"
+                  className="btn-cta"
                   onClick={() => openAuthModal({ mode: "register" })}
                 >
                   Регистрация
@@ -156,6 +155,18 @@ export function App() {
               </>
             )}
           </div>
+          {/* Mobile: compact auth for guests (always visible) */}
+          {!user && (
+            <div className="mobile-header-auth">
+              <button
+                type="button"
+                className="tab"
+                onClick={() => openAuthModal({ mode: "login" })}
+              >
+                Войти
+              </button>
+            </div>
+          )}
           {/* Mobile: burger button */}
           <button
             type="button"
@@ -165,6 +176,7 @@ export function App() {
             aria-expanded={menuOpen}
           >
             {menuOpen ? <XIcon /> : <MenuIcon />}
+            <span className="burger-label">{menuOpen ? "Закрыть" : "Меню"}</span>
           </button>
         </div>
 
@@ -186,6 +198,17 @@ export function App() {
           <>
             <div className="mobile-overlay" onClick={closeMenu} />
             <div className="mobile-menu">
+              {!user && (
+                <div className="mobile-register-cta">
+                  <button
+                    type="button"
+                    className="btn-cta"
+                    onClick={() => { openAuthModal({ mode: "register" }); closeMenu(); }}
+                  >
+                    Зарегистрироваться — бесплатно
+                  </button>
+                </div>
+              )}
               <nav className="mobile-nav">
                 {TABS.map((t) => (
                   <button
@@ -197,44 +220,25 @@ export function App() {
                   </button>
                 ))}
               </nav>
-              <div className="mobile-auth">
-                {user ? (
-                  <>
-                    <span className="mobile-auth-user muted">{user.username}</span>
-                    <button
-                      type="button"
-                      className="tab"
-                      onClick={() => { setAccountOpen(true); closeMenu(); }}
-                    >
-                      Аккаунт
-                    </button>
-                    <button
-                      type="button"
-                      className="tab"
-                      onClick={() => { logout(); closeMenu(); }}
-                    >
-                      Выйти
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button
-                      type="button"
-                      className="tab"
-                      onClick={() => { openAuthModal({ mode: "login" }); closeMenu(); }}
-                    >
-                      Войти
-                    </button>
-                    <button
-                      type="button"
-                      className="tab active"
-                      onClick={() => { openAuthModal({ mode: "register" }); closeMenu(); }}
-                    >
-                      Регистрация
-                    </button>
-                  </>
-                )}
-              </div>
+              {user && (
+                <div className="mobile-auth">
+                  <span className="mobile-auth-user muted">{user.username}</span>
+                  <button
+                    type="button"
+                    className="tab"
+                    onClick={() => { setAccountOpen(true); closeMenu(); }}
+                  >
+                    Аккаунт
+                  </button>
+                  <button
+                    type="button"
+                    className="tab"
+                    onClick={() => { logout(); closeMenu(); }}
+                  >
+                    Выйти
+                  </button>
+                </div>
+              )}
             </div>
           </>
         )}
