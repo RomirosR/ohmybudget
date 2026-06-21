@@ -12,22 +12,31 @@ import { useQueryClient } from "@tanstack/react-query";
 import { authApi, type AuthUser, type RegisterResponse } from "../api/auth";
 import { getToken, setOnUnauthorized, setToken } from "../api/client";
 
+export type AuthModalMode = "login" | "register" | "forgot" | "reset";
+
 export interface AuthModalState {
   open: boolean;
   message: string;
-  defaultMode: "login" | "register";
+  defaultMode: AuthModalMode;
+  resetToken?: string;
 }
 
 interface AuthContextValue {
   user: AuthUser | null;
   isLoading: boolean;
   authModal: AuthModalState;
-  login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string) => Promise<RegisterResponse>;
+  login: (username: string, password: string) => Promise<void>;
+  register: (
+    username: string,
+    email: string,
+    password: string,
+  ) => Promise<RegisterResponse>;
+  refreshUser: () => Promise<void>;
   logout: () => void;
   openAuthModal: (opts?: {
     message?: string;
-    mode?: "login" | "register";
+    mode?: AuthModalMode;
+    resetToken?: string;
   }) => void;
   closeAuthModal: () => void;
   runWithAuth: <T>(
@@ -57,6 +66,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     queryClient.clear();
   }, [queryClient]);
 
+  const refreshUser = useCallback(async () => {
+    setUser(await authApi.me());
+  }, []);
+
   useEffect(() => {
     setOnUnauthorized(() => {
       if (getToken()) logout();
@@ -77,8 +90,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .finally(() => setIsLoading(false));
   }, [logout]);
 
-  const finishLogin = async (email: string, password: string) => {
-    const { access_token } = await authApi.login({ email, password });
+  const finishLogin = async (username: string, password: string) => {
+    const { access_token } = await authApi.login({ username, password });
     setToken(access_token);
     setUser(await authApi.me());
     if (pendingRef.current) {
@@ -89,22 +102,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await queryClient.invalidateQueries();
   };
 
-  const login = async (email: string, password: string) => {
-    await finishLogin(email, password);
+  const login = async (username: string, password: string) => {
+    await finishLogin(username, password);
   };
 
-  const register = async (email: string, password: string) => {
-    return authApi.register({ email, password });
+  const register = async (
+    username: string,
+    email: string,
+    password: string,
+  ) => {
+    return authApi.register({ username, email, password });
   };
 
   const openAuthModal = useCallback(
-    (opts?: { message?: string; mode?: "login" | "register" }) => {
+    (opts?: {
+      message?: string;
+      mode?: AuthModalMode;
+      resetToken?: string;
+    }) => {
       setAuthModal({
         open: true,
         message:
           opts?.message ??
           "Зарегистрируйтесь или войдите, чтобы сохранить данные в аккаунте.",
         defaultMode: opts?.mode ?? "register",
+        resetToken: opts?.resetToken,
       });
     },
     [],
@@ -140,6 +162,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         authModal,
         login,
         register,
+        refreshUser,
         logout,
         openAuthModal,
         closeAuthModal,

@@ -118,6 +118,6 @@ def test_summary_rejects_invalid_month_query(auth_client):
 def test_login_rejects_oversized_password(client):
     r = client.post(
         "/api/auth/login",
-        json={"email": "test@example.com", "password": "x" * 129},
+        json={"username": "testuser", "password": "x" * 129},
     )
     assert r.status_code == 422

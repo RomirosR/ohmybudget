@@ -35,6 +35,7 @@ class Settings(BaseSettings):
     smtp_user: str = ""
     smtp_password: str = ""
     email_verify_expire_hours: int = 24
+    password_reset_expire_hours: int = 1
 
 
 settings = Settings()

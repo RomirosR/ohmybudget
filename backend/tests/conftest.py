@@ -15,6 +15,7 @@ from app.main import app
 from app.models.user import User
 
 TEST_USER_ID = 1
+TEST_USER_USERNAME = "testuser"
 TEST_USER_EMAIL = "test@example.com"
 TEST_USER_PASSWORD = "password123"
 
@@ -35,6 +36,7 @@ def db_session():
     db.add(
         User(
             id=TEST_USER_ID,
+            username=TEST_USER_USERNAME,
             email=TEST_USER_EMAIL,
             hashed_password=hash_password(TEST_USER_PASSWORD),
             email_verified_at=now,

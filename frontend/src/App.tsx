@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { authApi } from "./api/auth";
+import { AccountModal } from "./components/AccountModal";
 import { AuthModal } from "./components/AuthModal";
 import { useAuth } from "./context/AuthContext";
 import { PlansPage } from "./pages/PlansPage";
@@ -21,44 +22,66 @@ const TABS = [
   { key: "charts", label: "Графики", Component: ChartsPage },
 ] as const;
 
+type BannerState = "idle" | "pending" | "ok" | "error";
+
 export function App() {
-  const { user, isLoading, logout, openAuthModal } = useAuth();
+  const { user, isLoading, logout, openAuthModal, refreshUser } = useAuth();
   const [active, setActive] = useState<(typeof TABS)[number]["key"]>("plans");
-  const [verifyState, setVerifyState] = useState<
-    "idle" | "pending" | "ok" | "error"
-  >("idle");
-  const [verifyMessage, setVerifyMessage] = useState("");
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [bannerState, setBannerState] = useState<BannerState>("idle");
+  const [bannerMessage, setBannerMessage] = useState("");
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const token = params.get("verify");
+    const verify = params.get("verify");
+    const reset = params.get("reset");
+    const emailChange = params.get("email-change");
+    const token = verify ?? reset ?? emailChange;
     if (!token) return;
 
     params.delete("verify");
+    params.delete("reset");
+    params.delete("email-change");
     const nextUrl =
       window.location.pathname +
       (params.toString() ? `?${params}` : "") +
       window.location.hash;
     window.history.replaceState({}, "", nextUrl);
 
-    setVerifyState("pending");
-    authApi
-      .verifyEmail(token)
-      .then((result) => {
-        setVerifyState("ok");
-        setVerifyMessage(result.message);
-        openAuthModal({
-          mode: "login",
-          message: "Email подтверждён — войдите в аккаунт.",
-        });
+    if (reset) {
+      openAuthModal({
+        mode: "reset",
+        resetToken: token,
+        message: "Задайте новый пароль.",
+      });
+      return;
+    }
+
+    setBannerState("pending");
+    const action = verify
+      ? authApi.verifyEmail(token)
+      : authApi.confirmEmailChange(token);
+
+    action
+      .then(async (result) => {
+        setBannerState("ok");
+        setBannerMessage(result.message);
+        if (verify) {
+          openAuthModal({
+            mode: "login",
+            message: "Email подтверждён — войдите по нику и паролю.",
+          });
+        } else {
+          await refreshUser();
+        }
       })
       .catch((err) => {
-        setVerifyState("error");
-        setVerifyMessage(
+        setBannerState("error");
+        setBannerMessage(
           err instanceof Error ? err.message : "Ссылка недействительна",
         );
       });
-  }, [openAuthModal]);
+  }, [openAuthModal, refreshUser]);
 
   if (isLoading) {
     return <div className="app-main muted">Загрузка…</div>;
@@ -75,7 +98,14 @@ export function App() {
           <div className="header-user">
             {user ? (
               <>
-                <span className="muted">{user.email}</span>
+                <span className="muted">{user.username}</span>
+                <button
+                  type="button"
+                  className="tab"
+                  onClick={() => setAccountOpen(true)}
+                >
+                  Аккаунт
+                </button>
                 <button type="button" className="tab" onClick={logout}>
                   Выйти
                 </button>
@@ -114,14 +144,14 @@ export function App() {
         </nav>
       </header>
       <main className="app-main">
-        {verifyState === "pending" && (
-          <p className="guest-banner muted">Подтверждаем email…</p>
+        {bannerState === "pending" && (
+          <p className="guest-banner muted">Обрабатываем ссылку…</p>
         )}
-        {verifyState === "ok" && (
-          <p className="guest-banner verify-banner">{verifyMessage}</p>
+        {bannerState === "ok" && (
+          <p className="guest-banner verify-banner">{bannerMessage}</p>
         )}
-        {verifyState === "error" && (
-          <p className="guest-banner login-error">{verifyMessage}</p>
+        {bannerState === "error" && (
+          <p className="guest-banner login-error">{bannerMessage}</p>
         )}
         {!user && (
           <p className="guest-banner muted">
@@ -132,6 +162,7 @@ export function App() {
         <ActiveComponent />
       </main>
       <AuthModal />
+      <AccountModal open={accountOpen} onClose={() => setAccountOpen(false)} />
     </div>
   );
 }

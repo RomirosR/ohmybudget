@@ -71,8 +71,9 @@ cd frontend && npm run build
 
 - [ ] YC security group в консоли (опционально; UFW на ВМ уже есть) — `deploy/yc/security-group.md`
 - [ ] S3-бэкапы pg_dump (локальный cron есть: `/etc/cron.d/ohmybudget-backup`)
-- [ ] **Postbox в консоли YC** — DKIM/SPF для `noreply@ohmybudget.by`, ключи в `.env.prod` (код в `feature/email-verification`, журнал `docs/16-email-verification.md`)
 - [ ] E2E из `docs/04-infra-run.md`
+- [x] Email verification + Postbox — `docs/16-email-verification.md`
+- [ ] **Username auth** — ветка `feature/username-auth`, журнал `docs/17-username-auth.md`
 
 ## Ключевые файлы
 
