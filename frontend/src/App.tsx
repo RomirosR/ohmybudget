@@ -24,12 +24,32 @@ const TABS = [
 
 type BannerState = "idle" | "pending" | "ok" | "error";
 
+function MenuIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <line x1="3" y1="6" x2="21" y2="6" />
+      <line x1="3" y1="12" x2="21" y2="12" />
+      <line x1="3" y1="18" x2="21" y2="18" />
+    </svg>
+  );
+}
+
+function XIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  );
+}
+
 export function App() {
   const { user, isLoading, logout, openAuthModal, refreshUser } = useAuth();
   const [active, setActive] = useState<(typeof TABS)[number]["key"]>("plans");
   const [accountOpen, setAccountOpen] = useState(false);
   const [bannerState, setBannerState] = useState<BannerState>("idle");
   const [bannerMessage, setBannerMessage] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -90,6 +110,8 @@ export function App() {
   const ActiveComponent =
     TABS.find((t) => t.key === active)?.Component ?? PlansPage;
 
+  const closeMenu = () => setMenuOpen(false);
+
   return (
     <div className="app">
       <header className="app-header">
@@ -98,6 +120,7 @@ export function App() {
             <img className="brand-logo" src="/mascot.png" alt="" aria-hidden="true" />
             <h1>OhMyBudget</h1>
           </div>
+          {/* Desktop: auth/user controls */}
           <div className="header-user">
             {user ? (
               <>
@@ -115,7 +138,6 @@ export function App() {
               </>
             ) : (
               <>
-                <span className="muted guest-hint">Гостевой режим</span>
                 <button
                   type="button"
                   className="tab"
@@ -125,7 +147,7 @@ export function App() {
                 </button>
                 <button
                   type="button"
-                  className="tab active"
+                  className="btn-cta"
                   onClick={() => openAuthModal({ mode: "register" })}
                 >
                   Регистрация
@@ -133,7 +155,20 @@ export function App() {
               </>
             )}
           </div>
+          {/* Mobile: burger button */}
+          <button
+            type="button"
+            className="burger-btn"
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-label={menuOpen ? "Закрыть меню" : "Открыть меню"}
+            aria-expanded={menuOpen}
+          >
+            {menuOpen ? <XIcon /> : <MenuIcon />}
+            <span className="burger-label">{menuOpen ? "Закрыть" : "Меню"}</span>
+          </button>
         </div>
+
+        {/* Desktop: tabs */}
         <nav className="tabs">
           {TABS.map((t) => (
             <button
@@ -145,6 +180,63 @@ export function App() {
             </button>
           ))}
         </nav>
+
+        {/* Mobile: burger dropdown */}
+        {menuOpen && (
+          <>
+            <div className="mobile-overlay" onClick={closeMenu} />
+            <div className="mobile-menu">
+              {!user && (
+                <div className="mobile-register-cta">
+                  <button
+                    type="button"
+                    className="btn-cta"
+                    onClick={() => { openAuthModal({ mode: "register" }); closeMenu(); }}
+                  >
+                    Зарегистрироваться
+                  </button>
+                  <button
+                    type="button"
+                    className="tab"
+                    onClick={() => { openAuthModal({ mode: "login" }); closeMenu(); }}
+                  >
+                    Войти
+                  </button>
+                </div>
+              )}
+              <nav className="mobile-nav">
+                {TABS.map((t) => (
+                  <button
+                    key={t.key}
+                    className={t.key === active ? "tab active" : "tab"}
+                    onClick={() => { setActive(t.key); closeMenu(); }}
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </nav>
+              {user && (
+                <div className="mobile-auth">
+                  <span className="mobile-auth-user muted">{user.username}</span>
+                  <button
+                    type="button"
+                    className="tab"
+                    onClick={() => { setAccountOpen(true); closeMenu(); }}
+                  >
+                    Аккаунт
+                  </button>
+                  <button
+                    type="button"
+                    className="tab"
+                    onClick={() => { logout(); closeMenu(); }}
+                  >
+                    Выйти
+                  </button>
+                </div>
+              )}
+            </div>
+          </>
+        )}
       </header>
       <main className="app-main">
         {bannerState === "pending" && (
