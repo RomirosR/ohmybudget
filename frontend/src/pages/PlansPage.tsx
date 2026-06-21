@@ -114,16 +114,10 @@ export function PlansPage() {
             {monthName(g.month)} {g.year}
           </h3>
           <div className="table-wrap">
-            <table className="data-table" style={{ tableLayout: "fixed" }}>
-              <colgroup>
-                <col style={{ width: 48 }} />
-                <col />
-                <col style={{ width: 90 }} />
-                <col style={{ width: 130 }} />
-              </colgroup>
+            <table className="data-table">
               <thead>
                 <tr>
-                  <th></th>
+                  <th style={{ width: 48 }}></th>
                   <th>Категория</th>
                   <th>Тип</th>
                   <th style={{ textAlign: "right" }}>План на месяц</th>
