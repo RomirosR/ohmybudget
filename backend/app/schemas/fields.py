@@ -28,3 +28,12 @@ LookupId = Annotated[int, Field(ge=1)]
 
 Password = Annotated[str, Field(min_length=8, max_length=128)]
 LoginPassword = Annotated[str, Field(min_length=1, max_length=128)]
+Username = Annotated[
+    str,
+    StringConstraints(
+        min_length=3,
+        max_length=32,
+        strip_whitespace=True,
+        pattern=r"^[a-zA-Z0-9_]+$",
+    ),
+]
