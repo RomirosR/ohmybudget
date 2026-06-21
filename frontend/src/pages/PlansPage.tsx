@@ -74,17 +74,18 @@ export function PlansPage() {
   return (
     <div>
       <div className="card">
-        <div className="toolbar">
-          <h2>Планы по месяцам</h2>
+        <h2>Планы по месяцам</h2>
+        <PlanForm onSubmit={(data) => createMut.mutate(data)} />
+        {groups.length > 0 && (
           <button
             className="primary"
+            style={{ marginTop: 12 }}
             onClick={() => cloneMut.mutate()}
-            disabled={plans.length === 0 || cloneMut.isPending}
+            disabled={cloneMut.isPending}
           >
-            План на следующий месяц
+            Скопировать план за последний месяц
           </button>
-        </div>
-        <PlanForm onSubmit={(data) => createMut.mutate(data)} />
+        )}
       </div>
 
       {groups.length === 0 && <p className="muted">Планов пока нет.</p>}
