@@ -155,18 +155,6 @@ export function App() {
               </>
             )}
           </div>
-          {/* Mobile: compact auth for guests (always visible) */}
-          {!user && (
-            <div className="mobile-header-auth">
-              <button
-                type="button"
-                className="tab"
-                onClick={() => openAuthModal({ mode: "login" })}
-              >
-                Войти
-              </button>
-            </div>
-          )}
           {/* Mobile: burger button */}
           <button
             type="button"
@@ -205,7 +193,14 @@ export function App() {
                     className="btn-cta"
                     onClick={() => { openAuthModal({ mode: "register" }); closeMenu(); }}
                   >
-                    Зарегистрироваться — бесплатно
+                    Зарегистрироваться
+                  </button>
+                  <button
+                    type="button"
+                    className="tab"
+                    onClick={() => { openAuthModal({ mode: "login" }); closeMenu(); }}
+                  >
+                    Войти
                   </button>
                 </div>
               )}
