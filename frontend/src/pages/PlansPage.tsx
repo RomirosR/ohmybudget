@@ -117,10 +117,10 @@ export function PlansPage() {
             <table className="data-table">
               <thead>
                 <tr>
+                  <th style={{ width: 40 }}></th>
                   <th>Категория</th>
                   <th>Тип</th>
                   <th style={{ textAlign: "right" }}>План на месяц</th>
-                  <th style={{ width: 40 }}></th>
                 </tr>
               </thead>
               <tbody>
@@ -171,12 +171,7 @@ function PlanViewRow({
 }) {
   return (
     <tr>
-      <td>{p.category}</td>
-      <td className={p.is_income ? "income" : "expense"}>
-        {p.is_income ? "Доход" : "Расход"}
-      </td>
-      <td style={{ textAlign: "right" }}>{formatMoney(p.amount)}</td>
-      <td style={{ textAlign: "right", position: "relative" }}>
+      <td style={{ position: "relative" }}>
         <button className="row-menu-btn" onClick={onMenuToggle} aria-label="Действия">
           •••
         </button>
@@ -187,6 +182,11 @@ function PlanViewRow({
           </div>
         )}
       </td>
+      <td>{p.category}</td>
+      <td className={p.is_income ? "income" : "expense"}>
+        {p.is_income ? "Доход" : "Расход"}
+      </td>
+      <td style={{ textAlign: "right" }}>{formatMoney(p.amount)}</td>
     </tr>
   );
 }
@@ -220,6 +220,14 @@ function PlanEditRow({
   return (
     <>
       <tr className="edit-row">
+        <td style={{ whiteSpace: "nowrap" }}>
+          <button className="primary" onClick={handleSave} disabled={saving} style={{ fontSize: 13, padding: "4px 10px" }}>
+            ✓
+          </button>{" "}
+          <button className="tab" onClick={onCancel} style={{ fontSize: 13, padding: "4px 10px" }}>
+            ✕
+          </button>
+        </td>
         <td>
           <input
             ref={firstInput}
@@ -241,14 +249,6 @@ function PlanEditRow({
         </td>
         <td>
           <NumberField value={amount} onChange={setAmount} />
-        </td>
-        <td style={{ whiteSpace: "nowrap" }}>
-          <button className="primary" onClick={handleSave} disabled={saving} style={{ fontSize: 13, padding: "4px 10px" }}>
-            ✓
-          </button>{" "}
-          <button className="tab" onClick={onCancel} style={{ fontSize: 13, padding: "4px 10px" }}>
-            ✕
-          </button>
         </td>
       </tr>
       {error && (
