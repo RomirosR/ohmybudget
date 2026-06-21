@@ -94,7 +94,10 @@ export function App() {
     <div className="app">
       <header className="app-header">
         <div className="header-row">
-          <h1>OhMyBudget</h1>
+          <div className="brand">
+            <img className="brand-logo" src="/mascot.png" alt="" aria-hidden="true" />
+            <h1>OhMyBudget</h1>
+          </div>
           <div className="header-user">
             {user ? (
               <>

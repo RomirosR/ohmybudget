@@ -74,6 +74,7 @@ backend / данные.
 - `docs/07-auth.md` — журнал авторизации и изоляции данных.
 - `docs/16-email-verification.md` — подтверждение email при регистрации (Yandex Cloud Postbox).
 - `docs/17-username-auth.md` — ник, сброс пароля, смена email.
+- `docs/18-mascot-branding.md` — маскот-тюлень, favicon/иконки, лого в шапке.
 - `.cursor/rules/git-and-docs-workflow.mdc` — правила для AI-агентов (ветки, коммиты, docs, PR).
 - `docs/08-guest-mode.md` — журнал гостевого режима (просмотр без входа, сохранение после регистрации).
 - `docs/09-session-handoff.md` — **handoff для нового чата** (текущее состояние main, что сделано, как запускать).

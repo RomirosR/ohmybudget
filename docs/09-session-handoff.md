@@ -3,12 +3,12 @@
 > **Как использовать:** в новом чате прикрепи `@docs/09-session-handoff.md` (+ `@README.md`, при хостинге —
 > `@docs/12-hosting-handoff.md`). Правила агентов: `.cursor/rules/git-and-docs-workflow.mdc` (auto).
 
-**Обновлено:** 2026-06-09 (конец сессии: прод + CI/CD + security)
+**Обновлено:** 2026-06-21 (конец сессии: username auth влит в main, PR #14)
 
 ## Текущее состояние
 
 - **Репо:** https://github.com/RomirosR/ohmybudget
-- **Ветка:** `main` (= `origin/main`), последний merge: `f888fb8` (smart CI/CD + workflow rules, PR #10)
+- **Ветка:** `main` (= `origin/main`), последний merge: `8194c23` (username auth, PR #14)
 - **Прод:** https://ohmybudget.by — работает, HTTPS, CI/CD деплоит при изменении кода
 
 ## Что в main (фичи)
@@ -18,6 +18,8 @@
 | PostgreSQL dual-DB | `docs/06-postgres-migration.md` |
 | JWT + guest mode | `docs/07-auth.md`, `docs/08-guest-mode.md` |
 | Input validation | `docs/10-input-validation.md` |
+| Email verification | `docs/16-email-verification.md` (Postbox SMTP, JWT token) |
+| **Username auth** | `docs/17-username-auth.md` (ник + сброс пароля + смена email) |
 | **Хостинг YC** | `docs/13-hosting-yc.md`, handoff `docs/12-hosting-handoff.md` |
 | **Security прод** | `docs/14-hosting-security.md` |
 | **CI/CD** | `docs/15-cicd.md`, `.github/workflows/ci-cd.yml` |
@@ -71,21 +73,23 @@ cd frontend && npm run build
 
 - [ ] YC security group в консоли (опционально; UFW на ВМ уже есть) — `deploy/yc/security-group.md`
 - [ ] S3-бэкапы pg_dump (локальный cron есть: `/etc/cron.d/ohmybudget-backup`)
+- [ ] **Postbox в консоли YC** — настроить DKIM/SPF для `noreply@ohmybudget.by` и прописать ключи в `.env.prod` на проде (инструкция: `docs/16-email-verification.md`, шаги 3.1–3.3)
+- [ ] **Очистка прод-данных после деплоя username-auth** — `ssh … sudo bash deploy/wipe-user-data.sh`
 - [ ] E2E из `docs/04-infra-run.md`
-- [x] Email verification + Postbox — `docs/16-email-verification.md`
-- [ ] **Username auth** — ветка `feature/username-auth`, журнал `docs/17-username-auth.md`
 
 ## Ключевые файлы
 
 ```
 backend/app/api/deps/auth.py
-deploy/deploy.sh              # прод-обновление на сервере
-deploy/install-on-server.sh   # первичная установка
-deploy/apply-security.sh      # UFW + fail2ban
+backend/app/api/routes/auth.py        # register/login/forgot-password/reset/email-change
+deploy/deploy.sh                      # прод-обновление на сервере
+deploy/wipe-user-data.sh              # очистка пользователей и данных (один раз после деплоя username-auth)
+deploy/install-on-server.sh           # первичная установка
+deploy/apply-security.sh              # UFW + fail2ban
 .github/workflows/ci-cd.yml
 .cursor/rules/git-and-docs-workflow.mdc
 ```
 
 ## Следующие задачи (на выбор пользователя)
 
-Фичи приложения, S3-бэкапы, почта, E2E, YC SG — уточнить у пользователя.
+Фичи приложения, S3-бэкапы, Postbox в консоли YC, E2E, YC SG — уточнить у пользователя.

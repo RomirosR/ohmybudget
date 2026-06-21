@@ -17,3 +17,4 @@ dist/
 *.egg-info/
 *.tsbuildinfo
 deploy/security.env
+.DS_Store
