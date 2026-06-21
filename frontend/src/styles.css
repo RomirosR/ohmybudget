@@ -91,6 +91,7 @@ h2 {
 .data-table td {
   border-bottom: 1px solid var(--border);
   padding: 8px 10px;
+  vertical-align: middle;
 }
 
 .data-table th {

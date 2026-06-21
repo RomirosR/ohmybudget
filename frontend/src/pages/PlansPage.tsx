@@ -117,7 +117,7 @@ export function PlansPage() {
             <table className="data-table">
               <thead>
                 <tr>
-                  <th style={{ width: 40 }}></th>
+                  <th style={{ width: 40, textAlign: "center" }}></th>
                   <th>Категория</th>
                   <th>Тип</th>
                   <th style={{ textAlign: "right" }}>План на месяц</th>
@@ -171,7 +171,7 @@ function PlanViewRow({
 }) {
   return (
     <tr>
-      <td style={{ position: "relative" }}>
+      <td style={{ position: "relative", textAlign: "center" }}>
         <button className="row-menu-btn" onClick={onMenuToggle} aria-label="Действия">
           •••
         </button>
