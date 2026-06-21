@@ -64,6 +64,14 @@ curl -s https://ohmybudget.by/api/health
 
 **Что сделано:** `dorny/paths-filter` в workflow — docs-only merge не триггерит deploy.
 
+## Шаг 4 — flock в deploy.sh (коммит: pending)
+
+**Дата:** 2026-06-09
+
+**Что сделано:** `flock` на `.deploy.lock` — параллельный ручной deploy и GitHub Actions не ломают друг друга; health check 45×2 с.
+
+**Почему так:** run #11 упал на deploy — одновременно шёл ручной `deploy.sh` и Actions после merge PR #12. Test был green.
+
 ## Открыто
 
 - [x] GitHub Secrets `DEPLOY_HOST`, `DEPLOY_SSH_KEY`
