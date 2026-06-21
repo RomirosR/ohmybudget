@@ -66,40 +66,42 @@ export function InvestmentsPage() {
         />
       </div>
       <div className="card">
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>Инструмент</th>
-              <th>Тип</th>
-              <th style={{ textAlign: "right" }}>Ставка, %</th>
-              <th style={{ textAlign: "right" }}>Выплат в год</th>
-              <th style={{ textAlign: "right" }}>Текущая стоимость</th>
-              <th style={{ textAlign: "right" }}>Среднемес. доход</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {(data?.items ?? []).map((inv) => (
-              <tr key={inv.id}>
-                <td>{inv.name}</td>
-                <td>{typeName.get(inv.security_type_id) ?? "?"}</td>
-                <td style={{ textAlign: "right" }}>{inv.annual_rate}</td>
-                <td style={{ textAlign: "right" }}>{inv.payouts_per_year}</td>
-                <td style={{ textAlign: "right" }}>
-                  {formatMoney(inv.current_value)}
-                </td>
-                <td style={{ textAlign: "right" }}>
-                  {formatMoney(inv.monthly_income)}
-                </td>
-                <td style={{ textAlign: "right" }}>
-                  <button className="danger" onClick={() => deleteMut.mutate(inv.id)}>
-                    Удалить
-                  </button>
-                </td>
+        <div className="table-wrap">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Инструмент</th>
+                <th>Тип</th>
+                <th style={{ textAlign: "right" }}>Ставка, %</th>
+                <th style={{ textAlign: "right" }}>Выплат в год</th>
+                <th style={{ textAlign: "right" }}>Текущая стоимость</th>
+                <th style={{ textAlign: "right" }}>Среднемес. доход</th>
+                <th></th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {(data?.items ?? []).map((inv) => (
+                <tr key={inv.id}>
+                  <td>{inv.name}</td>
+                  <td>{typeName.get(inv.security_type_id) ?? "?"}</td>
+                  <td style={{ textAlign: "right" }}>{inv.annual_rate}</td>
+                  <td style={{ textAlign: "right" }}>{inv.payouts_per_year}</td>
+                  <td style={{ textAlign: "right" }}>
+                    {formatMoney(inv.current_value)}
+                  </td>
+                  <td style={{ textAlign: "right" }}>
+                    {formatMoney(inv.monthly_income)}
+                  </td>
+                  <td style={{ textAlign: "right" }}>
+                    <button className="danger" onClick={() => deleteMut.mutate(inv.id)}>
+                      Удалить
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         {(data?.items ?? []).length === 0 && (
           <p className="muted">Инструментов пока нет.</p>
         )}

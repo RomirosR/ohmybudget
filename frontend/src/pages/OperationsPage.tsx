@@ -64,36 +64,38 @@ export function OperationsPage() {
         />
       </div>
       <div className="card">
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>Дата</th>
-              <th>Тип</th>
-              <th>Категория</th>
-              <th>Описание</th>
-              <th style={{ textAlign: "right" }}>Сумма</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {sorted.map((o) => (
-              <tr key={o.id}>
-                <td>{o.date}</td>
-                <td className={o.is_income ? "income" : "expense"}>
-                  {o.is_income ? "Доход" : "Расход"}
-                </td>
-                <td>{o.category}</td>
-                <td>{o.description}</td>
-                <td style={{ textAlign: "right" }}>{formatMoney(o.amount)}</td>
-                <td style={{ textAlign: "right" }}>
-                  <button className="danger" onClick={() => deleteMut.mutate(o.id)}>
-                    Удалить
-                  </button>
-                </td>
+        <div className="table-wrap">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Дата</th>
+                <th>Тип</th>
+                <th>Категория</th>
+                <th>Описание</th>
+                <th style={{ textAlign: "right" }}>Сумма</th>
+                <th></th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {sorted.map((o) => (
+                <tr key={o.id}>
+                  <td>{o.date}</td>
+                  <td className={o.is_income ? "income" : "expense"}>
+                    {o.is_income ? "Доход" : "Расход"}
+                  </td>
+                  <td>{o.category}</td>
+                  <td>{o.description}</td>
+                  <td style={{ textAlign: "right" }}>{formatMoney(o.amount)}</td>
+                  <td style={{ textAlign: "right" }}>
+                    <button className="danger" onClick={() => deleteMut.mutate(o.id)}>
+                      Удалить
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         {sorted.length === 0 && <p className="muted">Операций пока нет.</p>}
       </div>
     </div>
