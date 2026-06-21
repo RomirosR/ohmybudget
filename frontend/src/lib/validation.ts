@@ -18,9 +18,27 @@ export const LIMITS = {
   payoutsMax: 365,
   passwordMin: 8,
   passwordMax: 128,
+  usernameMin: 3,
+  usernameMax: 32,
 } as const;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const USERNAME_RE = /^[a-zA-Z0-9_]+$/;
+
+export function validateUsername(username: string): string | null {
+  const t = username.trim();
+  if (!t) return "Укажите ник";
+  if (t.length < LIMITS.usernameMin) {
+    return `Минимум ${LIMITS.usernameMin} символа`;
+  }
+  if (t.length > LIMITS.usernameMax) {
+    return `Не более ${LIMITS.usernameMax} символов`;
+  }
+  if (!USERNAME_RE.test(t)) {
+    return "Только латиница, цифры и _";
+  }
+  return null;
+}
 
 export function validateEmail(email: string): string | null {
   const t = email.trim();
