@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { plansApi } from "../api/resources";
@@ -24,6 +24,9 @@ export function PlansPage() {
     queryFn: plansApi.list,
   });
 
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [menuId, setMenuId] = useState<number | null>(null);
+
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ["plans"] });
     qc.invalidateQueries({ queryKey: ["summary-months"] });
@@ -38,6 +41,14 @@ export function PlansPage() {
         "Зарегистрируйтесь, чтобы сохранить план.",
       ),
     onSuccess: invalidate,
+  });
+  const updateMut = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: PlanInput }) =>
+      runWithAuth(
+        () => plansApi.update(id, data),
+        "Войдите, чтобы изменять записи.",
+      ),
+    onSuccess: () => { invalidate(); setEditingId(null); },
   });
   const deleteMut = useMutation({
     mutationFn: (id: number) =>
@@ -56,7 +67,14 @@ export function PlansPage() {
     onSuccess: invalidate,
   });
 
-  // Группировка по (год, месяц), отсортировано по убыванию (новые сверху).
+  // Закрываем меню по клику вне
+  useEffect(() => {
+    if (menuId === null) return;
+    const close = () => setMenuId(null);
+    document.addEventListener("click", close);
+    return () => document.removeEventListener("click", close);
+  }, [menuId]);
+
   const groups = useMemo(() => {
     const map = new Map<string, { year: number; month: number; rows: Plan[] }>();
     for (const p of plans) {
@@ -67,7 +85,7 @@ export function PlansPage() {
     return [...map.values()].sort((a, b) => {
       const ka = a.year * 100 + a.month;
       const kb = b.year * 100 + b.month;
-      return kb - ka; // новые сверху
+      return kb - ka;
     });
   }, [plans]);
 
@@ -102,33 +120,143 @@ export function PlansPage() {
                   <th>Категория</th>
                   <th>Тип</th>
                   <th style={{ textAlign: "right" }}>План на месяц</th>
-                  <th></th>
+                  <th style={{ width: 40 }}></th>
                 </tr>
               </thead>
               <tbody>
-                {g.rows.map((p) => (
-                  <tr key={p.id}>
-                    <td>{p.category}</td>
-                    <td className={p.is_income ? "income" : "expense"}>
-                      {p.is_income ? "Доход" : "Расход"}
-                    </td>
-                    <td style={{ textAlign: "right" }}>{formatMoney(p.amount)}</td>
-                    <td style={{ textAlign: "right" }}>
-                      <button
-                        className="danger"
-                        onClick={() => deleteMut.mutate(p.id)}
-                      >
-                        Удалить
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {g.rows.map((p) =>
+                  editingId === p.id ? (
+                    <PlanEditRow
+                      key={p.id}
+                      plan={p}
+                      onSave={(data) => updateMut.mutate({ id: p.id, data })}
+                      onCancel={() => setEditingId(null)}
+                      saving={updateMut.isPending}
+                    />
+                  ) : (
+                    <PlanViewRow
+                      key={p.id}
+                      plan={p}
+                      menuOpen={menuId === p.id}
+                      onMenuToggle={(e) => {
+                        e.stopPropagation();
+                        setMenuId(menuId === p.id ? null : p.id);
+                      }}
+                      onEdit={() => { setMenuId(null); setEditingId(p.id); }}
+                      onDelete={() => { setMenuId(null); deleteMut.mutate(p.id); }}
+                    />
+                  )
+                )}
               </tbody>
             </table>
           </div>
         </div>
       ))}
     </div>
+  );
+}
+
+function PlanViewRow({
+  plan: p,
+  menuOpen,
+  onMenuToggle,
+  onEdit,
+  onDelete,
+}: {
+  plan: Plan;
+  menuOpen: boolean;
+  onMenuToggle: (e: React.MouseEvent) => void;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  return (
+    <tr>
+      <td>{p.category}</td>
+      <td className={p.is_income ? "income" : "expense"}>
+        {p.is_income ? "Доход" : "Расход"}
+      </td>
+      <td style={{ textAlign: "right" }}>{formatMoney(p.amount)}</td>
+      <td style={{ textAlign: "right", position: "relative" }}>
+        <button className="row-menu-btn" onClick={onMenuToggle} aria-label="Действия">
+          •••
+        </button>
+        {menuOpen && (
+          <div className="row-menu-dropdown">
+            <button onClick={onEdit}>Изменить</button>
+            <button className="danger" onClick={onDelete}>Удалить</button>
+          </div>
+        )}
+      </td>
+    </tr>
+  );
+}
+
+function PlanEditRow({
+  plan: p,
+  onSave,
+  onCancel,
+  saving,
+}: {
+  plan: Plan;
+  onSave: (data: PlanInput) => void;
+  onCancel: () => void;
+  saving: boolean;
+}) {
+  const [category, setCategory] = useState(p.category);
+  const [isIncome, setIsIncome] = useState(p.is_income);
+  const [amount, setAmount] = useState(p.amount);
+  const [error, setError] = useState<string | null>(null);
+  const firstInput = useRef<HTMLInputElement>(null);
+
+  useEffect(() => { firstInput.current?.focus(); }, []);
+
+  const handleSave = () => {
+    const err = firstError(validateCategory(category), validateMoney(amount));
+    if (err) { setError(err); return; }
+    setError(null);
+    onSave({ year: p.year, month: p.month, category: category.trim(), is_income: isIncome, amount });
+  };
+
+  return (
+    <>
+      <tr className="edit-row">
+        <td>
+          <input
+            ref={firstInput}
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            maxLength={LIMITS.categoryMax}
+            className="edit-input"
+          />
+        </td>
+        <td>
+          <select
+            value={isIncome ? "income" : "expense"}
+            onChange={(e) => setIsIncome(e.target.value === "income")}
+            className="edit-input"
+          >
+            <option value="expense">Расход</option>
+            <option value="income">Доход</option>
+          </select>
+        </td>
+        <td>
+          <NumberField value={amount} onChange={setAmount} />
+        </td>
+        <td style={{ whiteSpace: "nowrap" }}>
+          <button className="primary" onClick={handleSave} disabled={saving} style={{ fontSize: 13, padding: "4px 10px" }}>
+            ✓
+          </button>{" "}
+          <button className="tab" onClick={onCancel} style={{ fontSize: 13, padding: "4px 10px" }}>
+            ✕
+          </button>
+        </td>
+      </tr>
+      {error && (
+        <tr>
+          <td colSpan={4}><FieldError message={error} /></td>
+        </tr>
+      )}
+    </>
   );
 }
 
