@@ -38,6 +38,14 @@ export const operationsApi = {
   update: (id: number, data: OperationInput) =>
     api.put<Operation>(`/operations/${id}`, data),
   remove: (id: number) => api.del(`/operations/${id}`),
+  importParse: (file: File, bank: string) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("bank", bank);
+    return api.postForm<OperationInput[]>("/operations/import/parse", formData);
+  },
+  importConfirm: (items: OperationInput[]) =>
+    api.post<Operation[]>("/operations/import/confirm", items),
 };
 
 export const assetsApi = {
@@ -73,4 +81,5 @@ export const historyApi = {
 
 export const metaApi = {
   categories: () => api.get<string[]>("/meta/categories"),
+  importBanks: () => api.get<{ id: string; label: string }[]>("/meta/import-banks"),
 };
