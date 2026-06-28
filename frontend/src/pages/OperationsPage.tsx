@@ -1,9 +1,10 @@
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { metaApi, operationsApi } from "../api/resources";
 import { NumberField } from "../components/NumberField";
 import { FieldError } from "../components/FieldError";
+import { ImportBankModal } from "../components/ImportBankModal";
 import { ImportPreviewModal } from "../components/ImportPreviewModal";
 import { useGuardedAction } from "../hooks/useGuardedMutation";
 import { formatMoney, sortByDate } from "../lib/format";
@@ -20,8 +21,7 @@ import type { OperationInput } from "../types";
 export function OperationsPage() {
   const qc = useQueryClient();
   const runWithAuth = useGuardedAction();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [bank, setBank] = useState("");
+  const [importModalOpen, setImportModalOpen] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
   const [previewRows, setPreviewRows] = useState<OperationInput[] | null>(null);
 
@@ -61,13 +61,14 @@ export function OperationsPage() {
     onSuccess: invalidate,
   });
   const parseMut = useMutation({
-    mutationFn: (file: File) =>
+    mutationFn: ({ file, bank }: { file: File; bank: string }) =>
       runWithAuth(
         () => operationsApi.importParse(file, bank),
         "Зарегистрируйтесь, чтобы импортировать операции.",
       ),
     onSuccess: (rows) => {
       setImportError(null);
+      setImportModalOpen(false);
       setPreviewRows(rows);
     },
     onError: (err) => setImportError(err instanceof Error ? err.message : "Ошибка"),
@@ -91,29 +92,26 @@ export function OperationsPage() {
           categories={categories}
           onSubmit={(data) => createMut.mutate(data)}
         />
-        <div className="import-bar">
-          <select value={bank} onChange={(e) => setBank(e.target.value)}>
-            <option value="">Импорт из PDF — выберите банк</option>
-            {importBanks.map((b) => (
-              <option key={b.id} value={b.id}>
-                {b.label}
-              </option>
-            ))}
-          </select>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="application/pdf"
-            disabled={!bank || parseMut.isPending}
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) parseMut.mutate(file);
-              if (fileInputRef.current) fileInputRef.current.value = "";
-            }}
-          />
-        </div>
-        <FieldError message={importError} />
+        <button
+          className="primary"
+          style={{ marginTop: 12 }}
+          onClick={() => setImportModalOpen(true)}
+        >
+          Выгрузить из выписки
+        </button>
       </div>
+      {importModalOpen && (
+        <ImportBankModal
+          banks={importBanks}
+          pending={parseMut.isPending}
+          error={importError}
+          onSubmit={(file, bank) => parseMut.mutate({ file, bank })}
+          onClose={() => {
+            setImportModalOpen(false);
+            setImportError(null);
+          }}
+        />
+      )}
       {previewRows && (
         <ImportPreviewModal
           rows={previewRows}

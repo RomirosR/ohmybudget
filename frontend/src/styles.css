@@ -135,6 +135,10 @@ form.entry-form {
   min-width: 120px;
 }
 
+.field select[aria-invalid="true"] {
+  border-color: var(--expense);
+}
+
 .number-field {
   position: relative;
   display: inline-block;
@@ -677,10 +681,42 @@ button.danger {
   overflow-y: auto;
 }
 
-.import-bar {
+.file-picker {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
-  margin-top: 12px;
+  gap: 10px;
+}
+
+.file-picker-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  background: none;
+  color: var(--accent);
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.file-picker-btn:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+.file-picker-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.file-picker-name {
+  color: var(--muted);
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
