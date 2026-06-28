@@ -21,9 +21,10 @@ export function setToken(token: string | null) {
 async function request<T>(
   path: string,
   options: RequestInit = {},
+  jsonBody = true,
 ): Promise<T> {
   const headers: Record<string, string> = {
-    "Content-Type": "application/json",
+    ...(jsonBody ? { "Content-Type": "application/json" } : {}),
     ...(options.headers as Record<string, string>),
   };
   const token = getToken();
@@ -59,4 +60,6 @@ export const api = {
   put: <T>(path: string, body: unknown) =>
     request<T>(path, { method: "PUT", body: JSON.stringify(body) }),
   del: (path: string) => request<void>(path, { method: "DELETE" }),
+  postForm: <T>(path: string, body: FormData) =>
+    request<T>(path, { method: "POST", body }, false),
 };

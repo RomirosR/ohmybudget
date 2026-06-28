@@ -1,9 +1,10 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { metaApi, operationsApi } from "../api/resources";
 import { NumberField } from "../components/NumberField";
 import { FieldError } from "../components/FieldError";
+import { ImportPreviewModal } from "../components/ImportPreviewModal";
 import { useGuardedAction } from "../hooks/useGuardedMutation";
 import { formatMoney, sortByDate } from "../lib/format";
 import {
@@ -19,6 +20,11 @@ import type { OperationInput } from "../types";
 export function OperationsPage() {
   const qc = useQueryClient();
   const runWithAuth = useGuardedAction();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [bank, setBank] = useState("");
+  const [importError, setImportError] = useState<string | null>(null);
+  const [previewRows, setPreviewRows] = useState<OperationInput[] | null>(null);
+
   const { data: operations = [] } = useQuery({
     queryKey: ["operations"],
     queryFn: operationsApi.list,
@@ -26,6 +32,10 @@ export function OperationsPage() {
   const { data: categories = [] } = useQuery({
     queryKey: ["categories"],
     queryFn: metaApi.categories,
+  });
+  const { data: importBanks = [] } = useQuery({
+    queryKey: ["import-banks"],
+    queryFn: metaApi.importBanks,
   });
 
   const invalidate = () => {
@@ -50,6 +60,25 @@ export function OperationsPage() {
       ),
     onSuccess: invalidate,
   });
+  const parseMut = useMutation({
+    mutationFn: (file: File) =>
+      runWithAuth(
+        () => operationsApi.importParse(file, bank),
+        "Зарегистрируйтесь, чтобы импортировать операции.",
+      ),
+    onSuccess: (rows) => {
+      setImportError(null);
+      setPreviewRows(rows);
+    },
+    onError: (err) => setImportError(err instanceof Error ? err.message : "Ошибка"),
+  });
+  const confirmMut = useMutation({
+    mutationFn: (items: OperationInput[]) => operationsApi.importConfirm(items),
+    onSuccess: () => {
+      setPreviewRows(null);
+      invalidate();
+    },
+  });
 
   // Сортировка на клиенте: новые сверху.
   const sorted = useMemo(() => sortByDate(operations, "desc"), [operations]);
@@ -62,7 +91,38 @@ export function OperationsPage() {
           categories={categories}
           onSubmit={(data) => createMut.mutate(data)}
         />
+        <div className="import-bar">
+          <select value={bank} onChange={(e) => setBank(e.target.value)}>
+            <option value="">Импорт из PDF — выберите банк</option>
+            {importBanks.map((b) => (
+              <option key={b.id} value={b.id}>
+                {b.label}
+              </option>
+            ))}
+          </select>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="application/pdf"
+            disabled={!bank || parseMut.isPending}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) parseMut.mutate(file);
+              if (fileInputRef.current) fileInputRef.current.value = "";
+            }}
+          />
+        </div>
+        <FieldError message={importError} />
       </div>
+      {previewRows && (
+        <ImportPreviewModal
+          rows={previewRows}
+          categories={categories}
+          pending={confirmMut.isPending}
+          onConfirm={(items) => confirmMut.mutate(items)}
+          onClose={() => setPreviewRows(null)}
+        />
+      )}
       <div className="card">
         <div className="table-wrap">
           <table className="data-table">

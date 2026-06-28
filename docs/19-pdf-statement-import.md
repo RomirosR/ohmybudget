@@ -58,4 +58,23 @@
 
 ## Шаг 3 — фронтенд: импорт PDF на вкладке "Операции" (коммит: <hash>)
 **Дата:** 2026-06-28
-**Что сделано:** (заполняется по завершении фронтенд-шага)
+**Что сделано:**
+- `frontend/src/api/client.ts` — `api.postForm` для multipart-загрузки (без
+  ручного `Content-Type`, браузер сам выставляет boundary).
+- `frontend/src/api/resources.ts` — `metaApi.importBanks`,
+  `operationsApi.importParse`, `operationsApi.importConfirm`.
+- `frontend/src/components/ImportPreviewModal.tsx` — превью распознанных
+  операций: чекбоксы (по умолчанию все выбраны — без логики дублей), редактируемые
+  дата/тип/категория/описание/сумма, кнопка "Импортировать выбранные (N)".
+- `frontend/src/pages/OperationsPage.tsx` — блок импорта (выбор банка + файл)
+  рядом с формой ручного добавления операции; открывает превью-модалку по
+  результату `importParse`.
+- `frontend/src/styles.css` — `.modal-card-wide`, `.import-bar`.
+
+**Почему так:** превью переиспользует существующие компоненты формы
+(`NumberField`, datalist категорий) и паттерн модалки (`modal-overlay`/`modal-card`,
+как в `AccountModal`/`AuthModal`) — никакой новой инфраструктуры.
+
+**Как проверить:** `cd frontend && npm run build`; вручную — вкладка "Операции",
+выбрать банк, загрузить PDF, отредактировать/отметить строки в превью, подтвердить
+импорт, убедиться что в таблице операций появились только выбранные записи.
