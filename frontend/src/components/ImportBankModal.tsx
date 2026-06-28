@@ -41,51 +41,53 @@ export function ImportBankModal({
     <div className="modal-overlay" onClick={onClose}>
       <div className="card modal-card" onClick={(e) => e.stopPropagation()}>
         <h2>Выгрузить из выписки</h2>
-        <div className="field">
-          <label>Банк *</label>
-          <select
-            value={bank}
-            aria-invalid={bankError ? true : undefined}
-            onChange={(e) => {
-              setBank(e.target.value);
-              if (e.target.value) setBankError(null);
-            }}
-          >
-            <option value="">Выберите банк</option>
-            {banks.map((b) => (
-              <option key={b.id} value={b.id}>
-                {b.label}
-              </option>
-            ))}
-          </select>
-          <FieldError message={bankError} />
-        </div>
-        <div className="field">
-          <label>Файл выписки (PDF) *</label>
-          <div className="file-picker">
-            <button
-              type="button"
-              className="file-picker-btn"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              Выбрать файл
-            </button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="application/pdf"
-              className="file-picker-input"
+        <div className="import-bank-fields">
+          <div className="field">
+            <label>Банк *</label>
+            <select
+              value={bank}
+              aria-invalid={bankError ? true : undefined}
               onChange={(e) => {
-                const picked = e.target.files?.[0] ?? null;
-                setFile(picked);
-                if (picked) setFileError(null);
+                setBank(e.target.value);
+                if (e.target.value) setBankError(null);
               }}
-            />
-            <span className="file-picker-name">
-              {file ? file.name : "Файл не выбран"}
-            </span>
+            >
+              <option value="">Выберите банк</option>
+              {banks.map((b) => (
+                <option key={b.id} value={b.id}>
+                  {b.label}
+                </option>
+              ))}
+            </select>
+            <FieldError message={bankError} />
           </div>
-          <FieldError message={fileError} />
+          <div className="field">
+            <label>Файл выписки (PDF) *</label>
+            <div className="file-picker">
+              <button
+                type="button"
+                className="file-picker-btn"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                Выбрать файл
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="application/pdf"
+                className="file-picker-input"
+                onChange={(e) => {
+                  const picked = e.target.files?.[0] ?? null;
+                  setFile(picked);
+                  if (picked) setFileError(null);
+                }}
+              />
+              <span className="file-picker-name">
+                {file ? file.name : "Файл не выбран"}
+              </span>
+            </div>
+            <FieldError message={fileError} />
+          </div>
         </div>
         <FieldError message={error} />
         <div className="auth-modal-actions">

@@ -139,6 +139,13 @@ form.entry-form {
   border-color: var(--expense);
 }
 
+.import-bank-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 12px;
+}
+
 .number-field {
   position: relative;
   display: inline-block;
