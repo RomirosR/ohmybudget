@@ -685,7 +685,20 @@ button.danger {
 .modal-card-wide {
   max-width: 900px;
   max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-card-wide .table-wrap {
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
+}
+
+.modal-card-wide .data-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--card);
 }
 
 .file-picker {

@@ -8,9 +8,8 @@
 
 import re
 from datetime import datetime
-from io import BytesIO
 
-import pdfplumber
+from app.services.statement_parsers._common import clean, extract_tables
 
 _TXN_RE = re.compile(r"^\d{10,}$")
 _SUCCESS_STATUS = "Завершено успешно"
@@ -20,17 +19,12 @@ def parse(pdf_bytes: bytes) -> list[dict]:
     """Возвращает список операций из выписки. Бросает ValueError, если файл не
     является PDF или ни одна строка таблицы не распознана."""
     rows = []
-    try:
-        with pdfplumber.open(BytesIO(pdf_bytes)) as pdf:
-            for page in pdf.pages:
-                for table in page.extract_tables():
-                    rows.extend(_data_rows(table))
-    except Exception as exc:
-        raise ValueError("Не удалось прочитать файл как PDF.") from exc
+    for table in extract_tables(pdf_bytes):
+        rows.extend(_data_rows(table))
 
     operations = []
     for row in rows:
-        status = _clean(row[3])
+        status = clean(row[3])
         if status != _SUCCESS_STATUS:
             continue
         operations.append(_to_operation(row))
@@ -44,22 +38,18 @@ def parse(pdf_bytes: bytes) -> list[dict]:
 
 
 def _data_rows(table: list[list[str | None]]) -> list[list[str]]:
-    return [row for row in table if row and row[0] and _TXN_RE.match(_clean(row[0]).replace(" ", ""))]
-
-
-def _clean(cell: str | None) -> str:
-    return re.sub(r"\s+", " ", (cell or "")).strip()
+    return [row for row in table if row and row[0] and _TXN_RE.match(clean(row[0]).replace(" ", ""))]
 
 
 def _to_operation(row: list[str]) -> dict:
-    date_str = _clean(row[1]).split(" ")[0]
-    amount_str, _currency = _clean(row[4]).split(" ")
+    date_str = clean(row[1]).split(" ")[0]
+    amount_str, _currency = clean(row[4]).split(" ")
     is_income = amount_str.startswith("+")
     amount = float(amount_str.lstrip("+-").replace(",", "."))
 
-    place = _clean(row[5])
-    country = _clean(row[6])
-    detail = _clean(row[7])
+    place = clean(row[5])
+    country = clean(row[6])
+    detail = clean(row[7])
 
     return {
         "date": datetime.strptime(date_str, "%Y-%m-%d").date(),
