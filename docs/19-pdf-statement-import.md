@@ -56,7 +56,7 @@
 
 **Как проверить:** `cd backend && pytest tests/test_operations_import.py -v`.
 
-## Шаг 3 — фронтенд: импорт PDF на вкладке "Операции" (коммит: <hash>)
+## Шаг 3 — фронтенд: импорт PDF на вкладке "Операции" (коммит: f66f634)
 **Дата:** 2026-06-28
 **Что сделано:**
 - `frontend/src/api/client.ts` — `api.postForm` для multipart-загрузки (без
