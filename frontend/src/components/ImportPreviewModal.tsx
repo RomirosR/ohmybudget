@@ -24,7 +24,15 @@ export function ImportPreviewModal({
   onClose,
 }: ImportPreviewModalProps) {
   const [preview, setPreview] = useState<PreviewRow[]>(
-    rows.map((data) => ({ data, selected: true })),
+    rows.map((data) => ({
+      data: {
+        ...data,
+        category: categories.includes(data.category)
+          ? data.category
+          : categories[0] ?? data.category,
+      },
+      selected: true,
+    })),
   );
 
   const update = (index: number, patch: Partial<OperationInput>) => {
@@ -94,11 +102,16 @@ export function ImportPreviewModal({
                     </select>
                   </td>
                   <td>
-                    <input
-                      list="import-category-options"
+                    <select
                       value={row.data.category}
                       onChange={(e) => update(i, { category: e.target.value })}
-                    />
+                    >
+                      {categories.map((c) => (
+                        <option key={c} value={c}>
+                          {c}
+                        </option>
+                      ))}
+                    </select>
                   </td>
                   <td>
                     <input
@@ -119,11 +132,6 @@ export function ImportPreviewModal({
             </tbody>
           </table>
         </div>
-        <datalist id="import-category-options">
-          {categories.map((c) => (
-            <option key={c} value={c} />
-          ))}
-        </datalist>
         <div className="auth-modal-actions">
           <button
             type="button"
